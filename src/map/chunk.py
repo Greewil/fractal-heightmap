@@ -1,6 +1,8 @@
 from typing import AnyStr, Optional, List
 
-from new_src.default_values import *
+import numpy as np
+
+from src.default_values import *
 
 
 class Chunk:
@@ -12,17 +14,17 @@ class Chunk:
         if tiles is not None:
             self.tiles = tiles
         else:
-            self.tiles = [[0] * chunk_width for i in range(chunk_width)]
+            self.tiles = np.full((self.chunk_width, self.chunk_width), 0.0)
 
     @property
     def chunk_width(self):
         return self._chunk_width
 
     def get_tile(self, x: int, y: int) -> float:
-        return self.tiles[x][y]
+        return self.tiles[x, y]
 
     def set_tile(self, x: int, y: int, value: float):
-        self.tiles[x][y] = value
+        self.tiles[x, y] = value
 
     def __str__(self) -> AnyStr:
         output = '{"chunk_width": ' + str(self.chunk_width)
@@ -31,8 +33,8 @@ class Chunk:
         # output += ', "tiles": ['
         # for i in range(self.chunk_width):
         #     for j in range(self.chunk_width - 1):
-        #         output += str(self.tiles[i][j]) + ', '
-        # output += str(self.tiles[self.chunk_width - 1][self.chunk_width - 1]) + ']'
+        #         output += str(self.tiles[i, j]) + ', '
+        # output += str(self.tiles[self.chunk_width - 1, self.chunk_width - 1]) + ']'
 
         output += "}"
         return output

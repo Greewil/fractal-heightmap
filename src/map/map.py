@@ -2,9 +2,9 @@ from typing import AnyStr, Optional
 
 import numpy as np
 
-from new_src.default_values import *
-from new_src.utils import Bounding
-from new_src.utils.utils import get_random_seed
+from src.default_values import *
+from src.utils import Bounding
+from src.utils.utils import get_random_seed
 from .chunk import Chunk
 
 
@@ -62,7 +62,10 @@ class Map:
         chunk.set_tile(x % self.chunk_width, y % self.chunk_width, tile)
 
     def number_of_generated_tiles(self) -> int:
-        return len(self.chunks.keys()) * self.chunk_width * self.chunk_width
+        return self.number_of_generated_chunks() * self.chunk_width * self.chunk_width
+
+    def number_of_generated_chunks(self) -> int:
+        return len(self.chunks.keys())
 
     def bounding_chunks(self) -> Bounding:
         """

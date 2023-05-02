@@ -3,8 +3,8 @@ from typing import AnyStr, Optional
 
 from PIL import Image
 
-from new_src.map import Map
-from new_src.utils.bounding import Bounding
+from src.map import Map
+from src.utils.bounding import Bounding
 
 
 def save_map_as_image(value_map: Map, image_name: AnyStr, bounding: Bounding = None, max_value: Optional[int] = 255):
@@ -24,7 +24,7 @@ def save_map_as_image(value_map: Map, image_name: AnyStr, bounding: Bounding = N
             if c is not None:
                 for i in range(chunk_width):
                     for j in range(chunk_width):
-                        h = math.floor(255.0 / max_value * c.tiles[i][j])
+                        h = math.floor(255.0 / max_value * c.tiles[i, j])
                         global_x = (cx - bounding.left) * chunk_width + i
                         global_y = (cy - bounding.bottom) * chunk_width + j
                         pixels[global_x, global_y] = (h, h, h)
