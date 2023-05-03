@@ -1,1 +1,1 @@
-from .map_renderer import save_map_as_image
+from .map_renderer import save_heightmap_as_image

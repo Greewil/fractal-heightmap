@@ -30,7 +30,7 @@ def get_quad_dist(x1: float, y1: float, x2: float, y2: float) -> float:
 
 
 def get_random_seed() -> int:
-    return math.floor(rand() * sys.maxsize)
+    return math.floor(rand() * 2**32)
 
 
 def get_position_seed(x: int, y: int, seed: int = 0) -> int:
@@ -49,7 +49,7 @@ def get_position_seed(x: int, y: int, seed: int = 0) -> int:
             addition += 2 * spiral_width + x + max_abs  # top
         else:
             addition += 3 * spiral_width + x + max_abs  # bottom
-    return seed + addition
+    return (seed + addition) % (2**32)
 
 
 def is_power_of_two(x: int) -> bool:

@@ -1,6 +1,4 @@
-from typing import AnyStr, Optional
-
-import numpy as np
+from typing import AnyStr, Optional, Union
 
 from src.default_values import *
 from src.utils import Bounding
@@ -12,7 +10,10 @@ class Map:
 
     def __init__(self, seed: Optional[int] = None, chunk_width: Optional[int] = TILES_IN_CHUNK):
         self._chunk_width = chunk_width
-        self._seed = seed
+        if seed is None:
+            self._seed = get_random_seed()
+        else:
+            self._seed = seed % (2**32)
         self.chunks = {}
 
     @property
@@ -45,7 +46,7 @@ class Map:
         chunk = self.chunks.get(str((x, y)))
         return True if chunk is not None else False
 
-    def get_tile(self, x: int, y: int) -> float:
+    def get_tile(self, x: int, y: int) -> Union[float, object]:
         chunk_x = x // self.chunk_width
         chunk_y = y // self.chunk_width
         checking_chunk = self.get_chunk(chunk_x, chunk_y)
@@ -54,7 +55,7 @@ class Map:
         else:
             return None
 
-    def set_tile(self, x: int, y: int, tile: float):
+    def set_tile(self, x: int, y: int, tile: Union[float, object]):
         chunk_x = x // self.chunk_width
         chunk_y = y // self.chunk_width
         self.create_chunk(chunk_x, chunk_y)

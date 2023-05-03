@@ -7,7 +7,8 @@ from src.map import Map
 from src.utils.bounding import Bounding
 
 
-def save_map_as_image(value_map: Map, image_name: AnyStr, bounding: Bounding = None, max_value: Optional[int] = 255):
+def save_heightmap_as_image(value_map: Map, image_name: AnyStr, bounding: Bounding = None,
+                            max_value: Optional[int] = 255):
     if bounding is None:
         bounding = value_map.bounding_chunks()
     chunk_width = value_map.chunk_width

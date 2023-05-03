@@ -4,15 +4,18 @@ from typing import Optional
 import numpy as np
 
 from src.default_values import *
-from src.utils import Bounding
+from src.utils import Bounding, get_random_seed
 from src.utils import get_position_seed, is_power_of_two
 
 
 class FractalGenerator:
 
     def __init__(self, seed: Optional[int] = None, chunk_width: Optional[int] = TILES_IN_CHUNK,
-                 base_grid_distance: Optional[int] = DIAMOND_SQUARE_GRID_DISTANCE) -> None:
-        self.seed = seed
+                 base_grid_distance: Optional[int] = DIAMOND_SQUARE_GRID_STEP) -> None:
+        if seed is None:
+            self.seed = get_random_seed()
+        else:
+            self.seed = seed
         if not is_power_of_two(chunk_width):
             raise Exception("chunk_width should be the power of 2!")
         if not is_power_of_two(base_grid_distance):
@@ -24,9 +27,6 @@ class FractalGenerator:
         self._base_grid_steps = int(np.log2(base_grid_distance))
 
         self.chunks_in_base_grid_step = self.base_grid_distance // self.chunk_width
-        # if self.chunk_width > self.base_grid_distance:
-        #     self.value_matrix_width_chunks = 3  # 1 +- 1
-        # else:
         self.value_matrix_width_chunks = 4 * (self.base_grid_distance // self.chunk_width)
         self.value_matrix_width_tiles = self.value_matrix_width_chunks * self.chunk_width
         self.steps_impact_radii = [(0, 1)]
@@ -37,6 +37,14 @@ class FractalGenerator:
             self.steps_impact_radii.append((radii, radii + additional_value))
         print(self.steps_impact_radii)
         self._clean_value_matrix()
+
+    @property
+    def seed(self):
+        return self._seed
+
+    @seed.setter
+    def seed(self, value: int):
+        self._seed = value % (2 ** 32)
 
     @property
     def chunk_width(self):
@@ -84,6 +92,7 @@ class FractalGenerator:
         step_size = 2 ** step
         step_size_double = 2 * step_size
         radii = self.steps_impact_radii[step]
+
         # x-shape step
         cur_x = max(min(step_size + (target_left - radii[1]) // step_size_double * step_size_double,
                         target_bottom),
@@ -91,7 +100,6 @@ class FractalGenerator:
         y_start = max(min(step_size + (target_bottom - radii[1]) // step_size_double * step_size_double,
                           target_bottom),
                       step_size)
-        # print(cur_x, target_left, step_size, target_right + radii[1], radii)
         max_step_random = 100 / 2 ** (self.base_grid_steps - step)
         while cur_x <= target_right + radii[1]:
             cur_y = y_start
@@ -103,6 +111,7 @@ class FractalGenerator:
                                                   (self._random_sequence[cur_x, cur_y] - 0.5) * max_step_random
                 cur_y += step_size_double
             cur_x += step_size_double
+
         # +-shape step
         cur_x = min(step_size + (target_left - radii[0]) // step_size_double * step_size_double,
                     target_left)
@@ -137,13 +146,11 @@ class FractalGenerator:
         output_chunk_bottom = self.base_grid_distance + self.chunk_width * (chunk_y % self.chunks_in_base_grid_step)
         output_chunk_right = output_chunk_left + self.chunk_width
         output_chunk_top = output_chunk_bottom + self.chunk_width
-        # print(chunks_bounding, self.value_matrix_width_tiles, output_chunk_left, output_chunk_right)
 
         for step in range(self.base_grid_steps - 1, -1, -1):
             self._diamond_square_step(step,
                                       output_chunk_left, output_chunk_bottom,
                                       output_chunk_right, output_chunk_top)
 
-        chunk = self.value_matrix[output_chunk_left:output_chunk_right, output_chunk_bottom:output_chunk_top]
-        return chunk
-        # return self.value_matrix
+        ountput_matrix = self.value_matrix[output_chunk_left:output_chunk_right, output_chunk_bottom:output_chunk_top]
+        return ountput_matrix
