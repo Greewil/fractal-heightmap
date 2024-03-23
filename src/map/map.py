@@ -1,5 +1,7 @@
 from typing import AnyStr, Optional, Union
 
+import numpy as np
+
 from src.default_values import *
 from src.utils import Bounding
 from src.utils.utils import get_random_seed
@@ -31,7 +33,7 @@ class Map:
         self.chunks[str(chunk.position)] = chunk
 
     def create_chunk(self, x: int, y: int):
-        """ Create blank chunk if its not exist. """
+        """ Create blank chunk if it's not exist. """
         if not self.is_chunk_exists(x, y):
             self.chunks[str((x, y))] = Chunk(x, y, self.chunk_width)
 
@@ -72,9 +74,11 @@ class Map:
         """
         :return: bounding in chunks or None if there is no chunks in map
         """
-        bounding = Bounding(1, 1, -1, -1)
         if len(self.chunks.keys()) == 0:
             return None
+        first_chunk = next(iter(self.chunks.values()))
+        bounding = Bounding(first_chunk.position[0], first_chunk.position[1],
+                            first_chunk.position[0], first_chunk.position[1])
         for k, c in self.chunks.items():
             if c.position[0] > bounding.right:
                 bounding.right = c.position[0]

@@ -1,1 +1,2 @@
-from .map_renderer import save_heightmap_as_image
+from .map_renderer import save_height_map_as_image
+from .map_renderer import save_biome_map_as_image

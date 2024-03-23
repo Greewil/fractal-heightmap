@@ -11,7 +11,8 @@ from src.utils import get_position_seed, is_power_of_two
 class FractalGenerator:
 
     def __init__(self, seed: Optional[int] = None, chunk_width: Optional[int] = TILES_IN_CHUNK,
-                 base_grid_distance: Optional[int] = DIAMOND_SQUARE_GRID_STEP) -> None:
+                 base_grid_distance: Optional[int] = DIAMOND_SQUARE_GRID_STEP,
+                 base_grid_max_value: Optional[float] = DIAMOND_SQUARE_BASE_GRID_MAX_VALUE) -> None:
         if seed is None:
             self.seed = get_random_seed()
         else:
@@ -25,6 +26,7 @@ class FractalGenerator:
         self._chunk_width = chunk_width
         self._base_grid_distance = base_grid_distance
         self._base_grid_steps = int(np.log2(base_grid_distance))
+        self._base_grid_max_value = base_grid_max_value
 
         self.chunks_in_base_grid_step = self.base_grid_distance // self.chunk_width
         self.value_matrix_width_chunks = 4 * (self.base_grid_distance // self.chunk_width)
@@ -58,6 +60,10 @@ class FractalGenerator:
     def base_grid_distance(self):
         return self._base_grid_distance
 
+    @property
+    def base_grid_max_value(self):
+        return self._base_grid_max_value
+
     def _get_chunks_bounding(self, chunk_x: int, chunk_y: int) -> Bounding:
         grid_corner_x = chunk_x % self.chunks_in_base_grid_step
         grid_corner_y = chunk_y % self.chunks_in_base_grid_step
@@ -86,7 +92,7 @@ class FractalGenerator:
             for j in range(self.value_matrix_width_tiles // self.base_grid_distance):
                 x = i * self.base_grid_distance
                 y = j * self.base_grid_distance
-                self.value_matrix[x, y] = self._random_sequence[x, y] * 100
+                self.value_matrix[x, y] = self._random_sequence[x, y] * self.base_grid_max_value
 
     def _diamond_square_step(self, step, target_left: int, target_bottom: int, target_right: int, target_top: int):
         step_size = 2 ** step
@@ -100,7 +106,7 @@ class FractalGenerator:
         y_start = max(min(step_size + (target_bottom - radii[1]) // step_size_double * step_size_double,
                           target_bottom),
                       step_size)
-        max_step_random = 100 / 2 ** (self.base_grid_steps - step)
+        max_step_random = self.base_grid_max_value / 2 ** (self.base_grid_steps - step)
         while cur_x <= target_right + radii[1]:
             cur_y = y_start
             while cur_y <= target_top + radii[1]:

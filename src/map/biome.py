@@ -10,10 +10,16 @@ def base_height_modification(h: float, biome_parameters: Optional[dict] = None) 
 class BiomeType:
 
     def __init__(self,
-                 height_modification_method: Optional[Callable[[float, dict], float]] = base_height_modification,
+                 title: str,
+                 height_modification: Optional[Callable[[float, dict], float]] = base_height_modification,
                  biome_parameters: Optional[dict] = None,
                  rendering_color: Optional[Tuple[int, int, int]] = None):
-        self.height_modification = height_modification_method
+        if title is None:
+            raise Exception("title should be specified!")
+        self.title = title
+        if height_modification is None:
+            raise Exception("height_modification couldn't be None!")
+        self.height_modification = height_modification
         if biome_parameters is None:
             self.biome_parameters = {}
         else:
@@ -24,4 +30,19 @@ class BiomeType:
             self.rendering_color = rendering_color
 
 
-BASE_BIOME_TYPE = BiomeType()
+class BiomeInstance:
+    """Chunk with information about bioms types and their weights in tiles.
+
+    Attributes:
+        x               Global x position in tiles.
+        y               Global y position in tiles.
+        biome_type      Type of current biome.
+    """
+
+    def __init__(self, x: float, y: float, biome_type: BiomeType):
+        self.x = x
+        self.y = y
+        self.biome_type = biome_type
+
+
+BASE_BIOME_TYPE = BiomeType('Base biome')

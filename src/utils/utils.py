@@ -1,8 +1,11 @@
+import bisect
 import math
 import random
 import sys
 from random import random as rand
 from typing import List, Tuple
+
+import numpy as np
 
 from src.utils.bounding import Bounding
 
@@ -56,38 +59,37 @@ def is_power_of_two(x: int) -> bool:
     return (x & (x-1) == 0) and x != 0
 
 
-# TODO there is a much more efficient algorithm for this
-def random_selector_from_param(list_with_weights: List, selector_value: float = 0):
-    if (selector_value < 0) or (selector_value >= 1):
-        rnd_val = 0
-    else:
-        rnd_val = selector_value
-    summ = sum([x.weight for x in list_with_weights])
-    if summ == 0:
-        return list_with_weights[int(rnd_val * len(list_with_weights))]
-    else:
-        rnd = summ * rnd_val
-        selected_element = None
-        for x in list_with_weights:
-            if rnd > summ - x.weight:
-                selected_element = x
-                break
-            else:
-                summ -= x.weight
-        return selected_element
+def get_cumulative_distribution_list(weights: List[float]) -> List[float]:
+    cumulative_distribution = []
+    cur_summ = 0
+    for w in weights:
+        cur_summ += w
+        cumulative_distribution.append(cur_summ)
+    return cumulative_distribution
 
 
-# TODO there is a much more efficient algorithm for this
-def random_selector(list_with_weights: List, seed=0):
-    if seed == 0:
-        cur_seed = get_random_seed()
-    else:
-        cur_seed = seed
-    return random_selector_from_param(list_with_weights, random_from_seed(cur_seed))
+# can be O(n) instead of O(log(n)) using Alias Method (https://www.keithschwarz.com/darts-dice-coins/)
+# but it's ok for now :)
+def weighted_selection_by_parameter(cumulative_distribution_list: List[float], selector_value: float = 0) -> int:
+    if len(cumulative_distribution_list) == 0:
+        raise Exception("cumulative_distribution_list should have at least 1 element!")
+    left = 0
+    right = len(cumulative_distribution_list)
+    i = len(cumulative_distribution_list) // 2
+    while not (i == 0 or (cumulative_distribution_list[i] >= selector_value > cumulative_distribution_list[i - 1])):
+        if selector_value < cumulative_distribution_list[i]:
+            right = i
+            i = (left + i) // 2
+        else:
+            left = i
+            i = (right + i) // 2
+    return i
 
 
-def get_double_list_bounding(double_list: List[List]) -> Bounding:
-    if len(double_list) > 0:
-        return Bounding(0, 0, len(double_list), len(double_list[0]))
-    else:
-        return Bounding(0, 0, 0, 0)
+def weighted_random_selection(cumulative_distribution_list: List[float], seed: int = None) -> int:
+    if len(cumulative_distribution_list) == 0:
+        raise Exception("cumulative_distribution_list should have at least 1 element!")
+    weight_summ = cumulative_distribution_list[-1]
+    np.random.seed(seed)
+    selector_value = np.random.rand() * weight_summ
+    return weighted_selection_by_parameter(cumulative_distribution_list, selector_value)

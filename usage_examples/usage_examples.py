@@ -4,7 +4,7 @@ from src.default_values import TILES_IN_CHUNK
 from src.generation import FractalGenerator
 from src.map import Map
 from src.map.chunk import ValueChunk
-from src.rendering import save_heightmap_as_image
+from src.rendering import save_height_map_as_image
 from src.utils import get_position_seed
 
 if __name__ == '__main__':
@@ -30,7 +30,7 @@ if __name__ == '__main__':
     #         # height_map.set_tile(i, j, get_position_seed(i, j, v))
     #         # print(v)
     # print(time.process_time()-start)
-    # save_heightmap_as_image(height_map, 'tst', max_value=8*r*r)
+    # save_height_map_as_image(height_map, 'tst', max_color_value=8*r*r)
 
     # generator = FractalGenerator(height_map.seed, chunk_width, base_grid_distance)
     # # chunk = ValueChunk(0, 0, tiles=generator.generate_chunk_of_values(0, 0))
@@ -38,7 +38,7 @@ if __name__ == '__main__':
     # chunk = ValueChunk(0, 0, tiles=generator.generate_chunk_of_values(1, 1))
     # # print(chunk.tiles)
     # height_map.set_chunk(chunk)
-    # save_heightmap_as_image(height_map, 'tst', max_value=150)
+    # save_height_map_as_image(height_map, 'tst', max_color_value=150)
 
     chunk_width = 64
     base_grid_distance = 64
@@ -56,4 +56,4 @@ if __name__ == '__main__':
             height_map.set_chunk(chunk)
     print(time.process_time() - start, 'seconds')
     print(height_map.number_of_generated_chunks(), height_map.number_of_generated_tiles())
-    save_heightmap_as_image(height_map, 'tst', max_value=150)
+    save_height_map_as_image(height_map, 'tst', max_color_value=150)

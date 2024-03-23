@@ -1,7 +1,21 @@
+from __future__ import annotations
+
 from typing import AnyStr, Optional
 
 
 class Bounding:
+
+    @classmethod
+    def update_max_min(cls, x, y, bounding: Bounding):
+        if x < bounding.left:
+            bounding.left = x
+        if x > bounding.right:
+            bounding.right = x
+        if y < bounding.bottom:
+            bounding.bottom = y
+        if y > bounding.top:
+            bounding.top = y
+
     def __init__(self, left=0, bottom=0, right=0, top=0):
         self.left = left
         self.right = right
