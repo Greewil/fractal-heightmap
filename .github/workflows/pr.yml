@@ -1,0 +1,16 @@
+name: Pull request check
+
+on:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+
+  quality-assurance:
+    name: Quality Assurance
+    uses: ./.github/workflows/qa.yml
+
+  validate-version:
+    name: Validate version
+    uses: ./.github/workflows/validate_current_version.yml
+    needs: quality-assurance
