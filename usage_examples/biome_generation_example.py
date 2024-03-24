@@ -1,15 +1,13 @@
 import functools
 import time
 
-import numpy as np
-from scipy.spatial import Voronoi
-
-from src.generation import BiomeGenerator, FractalGenerator
-from src.map import Map
-from src.map.biome import BiomeType
-from src.map.chunk import ValueChunk
-from src.rendering import save_biome_map_as_image, save_height_map_as_image
-from src.utils import get_position_seed, weighted_random_selection, get_cumulative_distribution_list, Bounding
+from world_map_generator.generation import BiomeGenerator, FractalGenerator
+from world_map_generator.map import Map
+from world_map_generator.map.biome import BiomeType
+from world_map_generator.map.chunk import ValueChunk
+from world_map_generator.rendering import save_biome_map_as_image, save_height_map_as_image
+from world_map_generator.utils import get_position_seed, weighted_random_selection, get_cumulative_distribution_list, \
+    Bounding
 
 biome_example_1 = BiomeType(title='biome 1', biome_parameters={'appearance_weight': 2})
 biome_example_2 = BiomeType(title='biome 2', biome_parameters={'appearance_weight': 1})
@@ -20,7 +18,7 @@ biomes_weights = [b.biome_parameters['appearance_weight'] for b in biome_types_p
 biomes_cumulative_distribution = get_cumulative_distribution_list(biomes_weights)
 
 
-# @functools.lru_cache(maxsize=1000, typed=False)
+@functools.lru_cache(maxsize=1000, typed=False)
 def get_random_biome_example(biome_node_x: int, biome_node_y: int, seed: int) -> BiomeType:
     pos_seed = get_position_seed(biome_node_x, biome_node_y, seed + 69)
     biome_index = weighted_random_selection(biomes_cumulative_distribution, pos_seed)

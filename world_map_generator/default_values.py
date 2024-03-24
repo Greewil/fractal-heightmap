@@ -16,4 +16,4 @@ BIOME_GRID_STEP = 128
 # BIOME_BLEND_RADIOS:   Radios of borders smoothing between biomes.
 #                       After smoothing  each point near biome borders will have average nearby biomes
 #                       values with weights.
-BIOME_BLEND_RADIOS = 4
+BIOME_BLEND_RADIOS = 10

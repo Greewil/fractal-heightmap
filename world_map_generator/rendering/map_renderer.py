@@ -3,9 +3,9 @@ from typing import AnyStr, Optional, Callable, Tuple, Union, List
 
 from PIL import Image
 
-from src.map import Map
-from src.map.biome import BiomeType
-from src.utils.bounding import Bounding
+from world_map_generator.map import Map
+from world_map_generator.map.biome import BiomeType
+from world_map_generator.utils.bounding import Bounding
 
 
 def _save_map_as_image(value_map: Map, image_name: AnyStr,

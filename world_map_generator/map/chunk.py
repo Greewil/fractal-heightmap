@@ -2,8 +2,8 @@ from typing import AnyStr, Optional, List, Tuple
 
 import numpy as np
 
-from src.default_values import *
-from src.map.biome import BASE_BIOME_TYPE, BiomeType
+from world_map_generator.default_values import *
+from world_map_generator.map.biome import BASE_BIOME_TYPE, BiomeType
 
 
 class Chunk:

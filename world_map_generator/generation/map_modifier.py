@@ -3,10 +3,10 @@ from typing import Optional, List
 
 import numpy as np
 
-from src.default_values import *
-from src.map.chunk import ValueChunk, BiomeChunk
-from src.utils import Bounding, get_random_seed
-from src.utils import get_position_seed, is_power_of_two
+from world_map_generator.default_values import *
+from world_map_generator.map.chunk import ValueChunk, BiomeChunk
+from world_map_generator.utils import Bounding, get_random_seed
+from world_map_generator.utils import get_position_seed, is_power_of_two
 
 
 class MapModifier:

@@ -1,11 +1,11 @@
 import time
 
-from src.default_values import TILES_IN_CHUNK
-from src.generation import FractalGenerator
-from src.map import Map
-from src.map.chunk import ValueChunk
-from src.rendering import save_height_map_as_image
-from src.utils import get_position_seed
+from world_map_generator.default_values import TILES_IN_CHUNK
+from world_map_generator.generation import FractalGenerator
+from world_map_generator.map import Map
+from world_map_generator.map.chunk import ValueChunk
+from world_map_generator.rendering import save_height_map_as_image
+from world_map_generator.utils import get_position_seed
 
 if __name__ == '__main__':
     # chunk_width = 4

@@ -7,7 +7,7 @@ from typing import List, Tuple
 
 import numpy as np
 
-from src.utils.bounding import Bounding
+from world_map_generator.utils.bounding import Bounding
 
 
 def random_from_seed(seed: int) -> float:

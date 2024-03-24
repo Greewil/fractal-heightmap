@@ -4,13 +4,13 @@ import time
 import numpy as np
 from scipy.spatial import Voronoi
 
-from src.generation import BiomeGenerator, FractalGenerator
-from src.generation.map_modifier import MapModifier
-from src.map import Map
-from src.map.biome import BiomeType
-from src.map.chunk import ValueChunk
-from src.rendering import save_biome_map_as_image, save_height_map_as_image
-from src.utils import get_position_seed, weighted_random_selection, get_cumulative_distribution_list, Bounding
+from world_map_generator.generation import BiomeGenerator, FractalGenerator
+from world_map_generator.generation.map_modifier import MapModifier
+from world_map_generator.map import Map
+from world_map_generator.map.biome import BiomeType
+from world_map_generator.map.chunk import ValueChunk
+from world_map_generator.rendering import save_biome_map_as_image, save_height_map_as_image
+from world_map_generator.utils import get_position_seed, weighted_random_selection, get_cumulative_distribution_list, Bounding
 
 
 # def cliff_modifier_generator() -> float:

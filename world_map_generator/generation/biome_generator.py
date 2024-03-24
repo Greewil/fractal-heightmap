@@ -7,12 +7,12 @@ import PIL.Image as Image
 import PIL.ImageDraw as ImageDraw
 from scipy.spatial import Voronoi
 
-from src.default_values import TILES_IN_CHUNK, BIOME_GRID_STEP, BIOME_BLEND_RADIOS
-from src.map import Map
-from src.map.biome import BiomeType, BiomeInstance, BASE_BIOME_TYPE
-from src.map.chunk import BiomeChunk
-from src.utils import Bounding
-from src.utils.utils import get_random_seed, is_power_of_two, get_position_seed, get_quad_dist
+from world_map_generator.default_values import TILES_IN_CHUNK, BIOME_GRID_STEP, BIOME_BLEND_RADIOS
+from world_map_generator.map import Map
+from world_map_generator.map.biome import BiomeType, BiomeInstance, BASE_BIOME_TYPE
+from world_map_generator.map.chunk import BiomeChunk
+from world_map_generator.utils import Bounding
+from world_map_generator.utils.utils import get_random_seed, is_power_of_two, get_position_seed, get_quad_dist
 
 
 def get_base_biome_type(biome_node_x: int, biome_node_y: int, seed: int) -> BiomeType:

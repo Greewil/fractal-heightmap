@@ -1,6 +1,6 @@
 from typing import Optional, Callable, Tuple
 
-from src.utils import random_color
+from world_map_generator.utils import random_color
 
 
 def base_height_modification(h: float, biome_parameters: Optional[dict] = None) -> float:
