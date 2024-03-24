@@ -1,11 +1,10 @@
-import math
-from typing import Optional, List
+from typing import Optional
 
 import numpy as np
 
-from world_map_generator.default_values import *
+from world_map_generator.default_values import TILES_IN_CHUNK
 from world_map_generator.map.chunk import ValueChunk, BiomeChunk
-from world_map_generator.utils import Bounding, get_random_seed
+from world_map_generator.utils import get_random_seed
 from world_map_generator.utils import get_position_seed, is_power_of_two
 
 

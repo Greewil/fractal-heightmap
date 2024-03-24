@@ -1,19 +1,14 @@
 import functools
 import time
 
-import numpy as np
-from scipy.spatial import Voronoi
-
 from world_map_generator.generation import BiomeGenerator, FractalGenerator
 from world_map_generator.generation.map_modifier import MapModifier
 from world_map_generator.map import Map
 from world_map_generator.map.biome import BiomeType
 from world_map_generator.map.chunk import ValueChunk
 from world_map_generator.rendering import save_biome_map_as_image, save_height_map_as_image
-from world_map_generator.utils import get_position_seed, weighted_random_selection, get_cumulative_distribution_list, Bounding
-
-
-# def cliff_modifier_generator() -> float:
+from world_map_generator.utils import (get_position_seed, weighted_random_selection, get_cumulative_distribution_list,
+                                       Bounding)
 
 
 def cliff_modifier(height: float, biome_parameters: dict) -> float:
@@ -114,8 +109,8 @@ if __name__ == '__main__':
     for i in range(bounding.left, bounding.right):
         for j in range(bounding.bottom, bounding.top):
             modified_chunk_values = modifier.modify_heightmap_chunk(i, j,
-                                                             height_map.get_chunk(i, j),
-                                                             biome_map.get_chunk(i, j))
+                                                                    height_map.get_chunk(i, j),
+                                                                    biome_map.get_chunk(i, j))
             height_map.set_chunk(ValueChunk(i, j, tiles=modified_chunk_values))
     print(time.process_time() - start, 'seconds', '(modified heightmap)')
     print(f'seed = {height_map.seed}')

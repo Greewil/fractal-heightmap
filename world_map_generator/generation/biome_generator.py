@@ -1,5 +1,4 @@
 import math
-from collections import defaultdict
 from typing import Optional, List, Tuple, Callable
 
 import numpy as np
@@ -12,7 +11,7 @@ from world_map_generator.map import Map
 from world_map_generator.map.biome import BiomeType, BiomeInstance, BASE_BIOME_TYPE
 from world_map_generator.map.chunk import BiomeChunk
 from world_map_generator.utils import Bounding
-from world_map_generator.utils.utils import get_random_seed, is_power_of_two, get_position_seed, get_quad_dist
+from world_map_generator.utils.utils import get_random_seed, is_power_of_two, get_position_seed
 
 
 def get_base_biome_type(biome_node_x: int, biome_node_y: int, seed: int) -> BiomeType:
@@ -62,6 +61,7 @@ class BiomeGenerator:
         return self._random_sequence
 
     def _clean_value_matrix(self):
+        """ TODO """
         self.value_matrix = []
         for i in range(self.chunk_width):
             self.value_matrix.append([])
@@ -69,6 +69,7 @@ class BiomeGenerator:
                 self.value_matrix[i].append([])
 
     def get_closes_biomes_bounding(self, chunk_x: int, chunk_y: int) -> Bounding:
+        """ TODO """
         biome_grid_left_x = (chunk_x * self.chunk_width // self.biome_grid_step) - 2
         biome_grid_bottom_y = (chunk_y * self.chunk_width // self.biome_grid_step) - 2
         biome_grid_right_x = ((chunk_x + 1) * self.chunk_width // self.biome_grid_step) + 2
@@ -76,6 +77,7 @@ class BiomeGenerator:
         return Bounding(biome_grid_left_x, biome_grid_bottom_y, biome_grid_right_x, biome_grid_top_y)
 
     def get_biome_center(self, biome_node_x: int, biome_node_y: int) -> Tuple[float, float]:
+        """ TODO """
         pos_seed = get_position_seed(biome_node_x, biome_node_y, self.seed)
         np.random.seed(pos_seed)
         rnd = np.random.rand(2)
@@ -86,6 +88,7 @@ class BiomeGenerator:
     def get_closes_biomes(self, chunk_x: int, chunk_y: int,
                           get_biome_type: Callable[[int, int, int], BiomeType] = get_base_biome_type) \
             -> List[BiomeInstance]:
+        """ TODO """
         biome_grid_bounding = self.get_closes_biomes_bounding(chunk_x, chunk_y)
         biomes = []
         for i in range(biome_grid_bounding.left, biome_grid_bounding.right + 1):
@@ -98,6 +101,7 @@ class BiomeGenerator:
 
     def _get_closest_biomes_mix(self, tile_x: int, tile_y: int,
                                 biomes: List[BiomeInstance]) -> List[Tuple[float, BiomeType]]:
+        """ TODO """
         min_dist = 5 * self.biome_grid_step * self.biome_grid_step
         closest_biome_id = 0
         biome_distances = np.full(len(biomes), 0.0)
@@ -135,12 +139,13 @@ class BiomeGenerator:
     def _calculate_blending_point(self, x: int, y: int,
                                   biome_image_matrix,
                                   blending_point_code: int = 255) -> dict:
+        """ TODO """
         closest_biomes_dict = {}
         for i in range(x - self.biome_blend_radios, x + self.biome_blend_radios + 1):
             for j in range(y - self.biome_blend_radios, y + self.biome_blend_radios + 1):
                 cur_biome = biome_image_matrix[i, j]
                 if cur_biome != blending_point_code:
-                    dx, dy = x-i, y-j
+                    dx, dy = x - i, y - j
                     quad_dist = dx * dx + dy * dy
                     if closest_biomes_dict.get(cur_biome) is None:
                         closest_biomes_dict[cur_biome] = quad_dist
@@ -200,7 +205,7 @@ class BiomeGenerator:
                     voronoi_bordered_draw.polygon(xy=cur_polygon,
                                                   fill=i,
                                                   outline=self._blending_point_code,
-                                                  width=int(0.5*self.biome_blend_radios))
+                                                  width=int(0.5 * self.biome_blend_radios))
         return np.array(voronoi_image), np.array(voronoi_bordered_image)
 
     def generate_chunk_of_values_fast_voronoi(self, chunk_x: int, chunk_y: int,
@@ -225,8 +230,6 @@ class BiomeGenerator:
             additional_values = []
             for vm in value_maps:
                 additional_values.append(vm.get_chunk(chunk_x, chunk_y).tiles)
-                # additional_values.append(vm.get_np_matrix())
-                # print(additional_values[-1])
             shift_map_x = value_maps[0].get_chunk(chunk_x, chunk_y).tiles
             shift_map_y = value_maps[0].get_chunk(chunk_x + 1, chunk_y).tiles
         borders_smoothing = True
@@ -239,25 +242,19 @@ class BiomeGenerator:
 
         for i in range(self.biome_blend_radios, self.chunk_width + self.biome_blend_radios):
             for j in range(self.biome_blend_radios, self.chunk_width + self.biome_blend_radios):
-                cur_biome_id = np_voronoi_bordered_image[j, i]
                 cur_biome_not_blended_id = np_voronoi_image[j, i]
                 in_chunk_x, in_chunk_y = i - self.biome_blend_radios, j - self.biome_blend_radios
                 weighted_biomes = self.value_matrix[i - self.biome_blend_radios][j - self.biome_blend_radios]
                 if not borders_smoothing:
                     weighted_biomes.append((1, closest_biomes[cur_biome_not_blended_id].biome_type))
                 else:
-                    # weighted_biomes.append((1, closest_biomes[cur_biome_not_blended_id].biome_type))
-                    # if cur_biome_id != blending_point_code:
-                    #     weighted_biomes.append((1, closest_biomes[cur_biome_not_blended_id].biome_type))
-                    # else:
                     shift_x = int(self.biome_blend_radios * (shift_map_x[in_chunk_x, in_chunk_y] - 0.5))
                     shift_y = int(self.biome_blend_radios * (shift_map_y[in_chunk_x, in_chunk_y] - 0.5))
-                    # weighted_biomes.append((1 - shift_map_x[in_chunk_x, in_chunk_y],
-                    #                         closest_biomes[cur_biome_not_blended_id].biome_type))
                     cur_biome_blended_id = np_voronoi_image[j + shift_x, i + shift_y]
                     cur_biome_not_blended_id = np_voronoi_bordered_image[j + shift_x, i + shift_y]
                     if cur_biome_not_blended_id != self._blending_point_code:
-                        weighted_biomes.append((shift_map_x[in_chunk_x, in_chunk_y], closest_biomes[cur_biome_not_blended_id].biome_type))
+                        weighted_biomes.append((shift_map_x[in_chunk_x, in_chunk_y],
+                                                closest_biomes[cur_biome_not_blended_id].biome_type))
                     else:
                         weighted_biomes.append((1, closest_biomes[cur_biome_blended_id].biome_type))
                         # TODO maybe use few random point and then little smooth
@@ -266,28 +263,10 @@ class BiomeGenerator:
                             dx = int(self.biome_blend_radios * (rnd[0] - 0.5))
                             dy = int(self.biome_blend_radios * (rnd[1] - 0.5))
                             additional_biome_id = np_voronoi_image[j + dx + shift_x, i + dy + shift_y]
-                            # print(additional_biome_id, cur_biome_id, dx, dy)
                             # if cur_biome_blended_id != additional_biome_id:
                             if dx != 0 or dy != 0:
-                                blend_weight = 1 / math.sqrt(dx*dx + dy*dy)
+                                blend_weight = 1 / math.sqrt(dx * dx + dy * dy)
                                 weighted_biomes.append((blend_weight, closest_biomes[additional_biome_id].biome_type))
-
-                # -- random blending --
-                # cur_biome_id = np_voronoi_bordered_image[j, i]
-                # cur_biome_not_blended_id = np_voronoi_image[j, i]
-                # weighted_biomes = self.value_matrix[i - self.biome_blend_radios][j - self.biome_blend_radios]
-                # weighted_biomes.append((1, closest_biomes[cur_biome_not_blended_id].biome_type))
-                # if cur_biome_id == self._blending_point_code:
-                #     for n in range(8):
-                #         rnd = np.random.rand(2)
-                #         dx = int(self.biome_blend_radios * (rnd[0] - 0.5))
-                #         dy = int(self.biome_blend_radios * (rnd[1] - 0.5))
-                #         additional_biome_id = np_voronoi_image[j + dx, i + dy]
-                #         # print(additional_biome_id, cur_biome_id, dx, dy)
-                #         if cur_biome_not_blended_id != additional_biome_id:
-                #             blend_weight = 1 / math.sqrt(dx*dx + dy*dy)
-                #             weighted_biomes.append((blend_weight, closest_biomes[additional_biome_id].biome_type))
-        # voronoi_image.show()
 
         output_chunk = BiomeChunk(chunk_x, chunk_y, self.chunk_width, self.value_matrix)
         return output_chunk

@@ -2,7 +2,7 @@ from typing import AnyStr, Optional, List, Tuple
 
 import numpy as np
 
-from world_map_generator.default_values import *
+from world_map_generator.default_values import TILES_IN_CHUNK
 from world_map_generator.map.biome import BASE_BIOME_TYPE, BiomeType
 
 
@@ -74,4 +74,4 @@ class BiomeChunk(Chunk):
                  tiles: Optional[List[List[List[Tuple[float, BiomeType]]]]] = None):
         super().__init__(x, y, chunk_width, tiles)
         if self.tiles is None:
-            self.tiles = [[[(1, BASE_BIOME_TYPE)]]*self.chunk_width for i in range(chunk_width)]
+            self.tiles = [[[(1, BASE_BIOME_TYPE)]] * self.chunk_width for _ in range(chunk_width)]

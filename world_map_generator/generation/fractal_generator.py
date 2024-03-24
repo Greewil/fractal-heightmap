@@ -65,6 +65,7 @@ class FractalGenerator:
         return self._base_grid_max_value
 
     def _get_chunks_bounding(self, chunk_x: int, chunk_y: int) -> Bounding:
+        """ TODO """
         grid_corner_x = chunk_x % self.chunks_in_base_grid_step
         grid_corner_y = chunk_y % self.chunks_in_base_grid_step
         return Bounding(chunk_x - grid_corner_x - self.chunks_in_base_grid_step,
@@ -73,6 +74,7 @@ class FractalGenerator:
                         chunk_y - grid_corner_y + 3 * self.chunks_in_base_grid_step)
 
     def _generate_random_sequence(self, bounding: Bounding):
+        """ TODO """
         randoms_matrix = []
         i = 0
         for x in range(bounding.left, bounding.right + 1):
@@ -85,9 +87,11 @@ class FractalGenerator:
         self._random_sequence = np.bmat(randoms_matrix)
 
     def _clean_value_matrix(self):
+        """ TODO """
         self.value_matrix = np.full((self.value_matrix_width_tiles, self.value_matrix_width_tiles), 0.0)
 
     def _generate_base_grid(self):
+        """ TODO """
         for i in range(self.value_matrix_width_tiles // self.base_grid_distance):
             for j in range(self.value_matrix_width_tiles // self.base_grid_distance):
                 x = i * self.base_grid_distance
@@ -95,6 +99,7 @@ class FractalGenerator:
                 self.value_matrix[x, y] = self._random_sequence[x, y] * self.base_grid_max_value
 
     def _diamond_square_step(self, step, target_left: int, target_bottom: int, target_right: int, target_top: int):
+        """ TODO """
         step_size = 2 ** step
         step_size_double = 2 * step_size
         radii = self.steps_impact_radii[step]

@@ -1,13 +1,9 @@
-import bisect
 import math
 import random
-import sys
 from random import random as rand
-from typing import List, Tuple
+from typing import List
 
 import numpy as np
-
-from world_map_generator.utils.bounding import Bounding
 
 
 def random_from_seed(seed: int) -> float:
@@ -33,7 +29,7 @@ def get_quad_dist(x1: float, y1: float, x2: float, y2: float) -> float:
 
 
 def get_random_seed() -> int:
-    return math.floor(rand() * 2**32)
+    return math.floor(rand() * 2 ** 32)
 
 
 def get_position_seed(x: int, y: int, seed: int = 0) -> int:
@@ -52,11 +48,11 @@ def get_position_seed(x: int, y: int, seed: int = 0) -> int:
             addition += 2 * spiral_width + x + max_abs  # top
         else:
             addition += 3 * spiral_width + x + max_abs  # bottom
-    return (seed + addition) % (2**32)
+    return (seed + addition) % (2 ** 32)
 
 
 def is_power_of_two(x: int) -> bool:
-    return (x & (x-1) == 0) and x != 0
+    return (x & (x - 1) == 0) and x != 0
 
 
 def get_cumulative_distribution_list(weights: List[float]) -> List[float]:
@@ -68,7 +64,7 @@ def get_cumulative_distribution_list(weights: List[float]) -> List[float]:
     return cumulative_distribution
 
 
-# can be O(n) instead of O(log(n)) using Alias Method (https://www.keithschwarz.com/darts-dice-coins/)
+# TODO can be O(n) instead of O(log(n)) using Alias Method (https://www.keithschwarz.com/darts-dice-coins/)
 # but it's ok for now :)
 def weighted_selection_by_parameter(cumulative_distribution_list: List[float], selector_value: float = 0) -> int:
     if len(cumulative_distribution_list) == 0:
