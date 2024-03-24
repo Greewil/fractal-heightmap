@@ -1,0 +1,18 @@
+name: Quality Assurance
+
+on: [workflow_call]
+
+jobs:
+
+  quality-assurance:
+    name: Quality Assurance
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Install requirements
+        run: |
+          pip install -r requirements.txt
+      - name: Lint
+        run: |
+          flake8
