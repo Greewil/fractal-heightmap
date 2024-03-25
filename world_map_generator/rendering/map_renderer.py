@@ -5,7 +5,7 @@ from PIL import Image
 
 from world_map_generator.map import Map
 from world_map_generator.map.biome import BiomeType
-from world_map_generator.utils.bounding import Bounding
+from world_map_generator.utils import Bounding
 
 
 def _save_map_as_image(value_map: Map, image_name: AnyStr,

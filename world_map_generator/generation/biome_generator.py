@@ -11,7 +11,7 @@ from world_map_generator.map import Map
 from world_map_generator.map.biome import BiomeType, BiomeInstance, BASE_BIOME_TYPE
 from world_map_generator.map.chunk import BiomeChunk
 from world_map_generator.utils import Bounding
-from world_map_generator.utils.utils import get_random_seed, is_power_of_two, get_position_seed
+from world_map_generator.utils import get_random_seed, is_power_of_two, get_position_seed
 
 
 def get_base_biome_type(biome_node_x: int, biome_node_y: int, seed: int) -> BiomeType:

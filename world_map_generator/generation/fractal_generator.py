@@ -3,7 +3,8 @@ from typing import Optional
 
 import numpy as np
 
-from world_map_generator.default_values import *
+from world_map_generator.default_values import TILES_IN_CHUNK, DIAMOND_SQUARE_GRID_STEP, \
+    DIAMOND_SQUARE_BASE_GRID_MAX_VALUE
 from world_map_generator.utils import Bounding, get_random_seed
 from world_map_generator.utils import get_position_seed, is_power_of_two
 
@@ -115,11 +116,11 @@ class FractalGenerator:
         while cur_x <= target_right + radii[1]:
             cur_y = y_start
             while cur_y <= target_top + radii[1]:
-                self.value_matrix[cur_x, cur_y] = 0.25 * (self.value_matrix[cur_x - step_size, cur_y - step_size] +
-                                                          self.value_matrix[cur_x - step_size, cur_y + step_size] +
-                                                          self.value_matrix[cur_x + step_size, cur_y - step_size] +
-                                                          self.value_matrix[cur_x + step_size, cur_y + step_size]) + \
-                                                  (self._random_sequence[cur_x, cur_y] - 0.5) * max_step_random
+                self.value_matrix[cur_x, cur_y] = 0.25 * (self.value_matrix[cur_x - step_size, cur_y - step_size]
+                                                          + self.value_matrix[cur_x - step_size, cur_y + step_size]
+                                                          + self.value_matrix[cur_x + step_size, cur_y - step_size]
+                                                          + self.value_matrix[cur_x + step_size, cur_y + step_size])
+                self.value_matrix[cur_x, cur_y] += (self._random_sequence[cur_x, cur_y] - 0.5) * max_step_random
                 cur_y += step_size_double
             cur_x += step_size_double
 
@@ -133,11 +134,11 @@ class FractalGenerator:
         while cur_x <= target_right + radii[0]:
             cur_y = y_start + (i % 2) * step_size
             while cur_y <= target_top + radii[0]:
-                self.value_matrix[cur_x, cur_y] = 0.25 * (self.value_matrix[cur_x + step_size, cur_y] +
-                                                          self.value_matrix[cur_x - step_size, cur_y] +
-                                                          self.value_matrix[cur_x, cur_y - step_size] +
-                                                          self.value_matrix[cur_x, cur_y + step_size]) + \
-                                                  (self._random_sequence[cur_x, cur_y] - 0.5) * max_step_random
+                self.value_matrix[cur_x, cur_y] = 0.25 * (self.value_matrix[cur_x + step_size, cur_y]
+                                                          + self.value_matrix[cur_x - step_size, cur_y]
+                                                          + self.value_matrix[cur_x, cur_y - step_size]
+                                                          + self.value_matrix[cur_x, cur_y + step_size])
+                self.value_matrix[cur_x, cur_y] += (self._random_sequence[cur_x, cur_y] - 0.5) * max_step_random
                 cur_y += step_size_double
             cur_x += step_size
             i += 1

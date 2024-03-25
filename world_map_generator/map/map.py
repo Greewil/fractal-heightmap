@@ -2,7 +2,7 @@ from typing import AnyStr, Optional, Union
 
 from world_map_generator.default_values import TILES_IN_CHUNK
 from world_map_generator.utils import Bounding
-from world_map_generator.utils.utils import get_random_seed
+from world_map_generator.utils import get_random_seed
 from .chunk import Chunk
 
 
