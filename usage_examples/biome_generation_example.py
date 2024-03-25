@@ -47,7 +47,8 @@ if __name__ == '__main__':
 
     biome_map = Map(seed, chunk_width=chunk_width)
 
-    biome_generator = BiomeGenerator(biome_map.seed, chunk_width, biome_grid_step, biome_blend_radios)
+    biome_generator = BiomeGenerator(biome_map.seed, chunk_width, biome_grid_step, biome_blend_radios,
+                                     get_random_biome_example)
 
     # print(f'seed = {biome_map.seed}')
     # start = time.process_time()
@@ -72,7 +73,7 @@ if __name__ == '__main__':
     save_height_map_as_image(shift_map, 'shift_map', max_color_value=1.5 * base_grid_max_value)
 
     def generate_biomes_chunk(x: int, y: int):
-        closest_biomes = biome_generator.get_closes_biomes(x, y, get_random_biome_example)
+        closest_biomes = biome_generator.get_closest_biomes(x, y)
         print(x, y, len(closest_biomes), 'closest_biomes')
 
         chunk = biome_generator.generate_chunk_of_values_fast_voronoi(x, y, closest_biomes, [shift_map])

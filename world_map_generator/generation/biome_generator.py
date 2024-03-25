@@ -22,7 +22,8 @@ class BiomeGenerator:
 
     def __init__(self, seed: Optional[int] = None, chunk_width: Optional[int] = TILES_IN_CHUNK,
                  biome_grid_step: Optional[int] = BIOME_GRID_STEP,
-                 biome_blend_radios: Optional[int] = BIOME_BLEND_RADIOS):
+                 biome_blend_radios: Optional[int] = BIOME_BLEND_RADIOS,
+                 get_biome_type: Callable[[int, int, int], BiomeType] = get_base_biome_type):
         if seed is None:
             self.seed = get_random_seed()
         else:
@@ -32,6 +33,7 @@ class BiomeGenerator:
         self._chunk_width = chunk_width
         self._biome_grid_step = biome_grid_step
         self._biome_blend_radios = biome_blend_radios
+        self._get_biome_type = get_biome_type
         self._clean_value_matrix()
         self._blending_point_code = 255
         # may be use "RGB" instead of if more than 255 types (1 for borders) of biomes
@@ -55,6 +57,10 @@ class BiomeGenerator:
     @property
     def biome_blend_radios(self):
         return self._biome_blend_radios
+
+    @property
+    def get_biome_type(self):
+        return self._get_biome_type
 
     @property
     def random_sequence(self):
@@ -85,16 +91,14 @@ class BiomeGenerator:
         biome_center_y = self.biome_grid_step * (biome_node_y + rnd[1] - 0.5)
         return biome_center_x, biome_center_y
 
-    def get_closes_biomes(self, chunk_x: int, chunk_y: int,
-                          get_biome_type: Callable[[int, int, int], BiomeType] = get_base_biome_type) \
-            -> List[BiomeInstance]:
+    def get_closest_biomes(self, chunk_x: int, chunk_y: int) -> List[BiomeInstance]:
         """ TODO """
         biome_grid_bounding = self.get_closes_biomes_bounding(chunk_x, chunk_y)
         biomes = []
         for i in range(biome_grid_bounding.left, biome_grid_bounding.right + 1):
             for j in range(biome_grid_bounding.bottom, biome_grid_bounding.top + 1):
                 biome_center = self.get_biome_center(i, j)
-                biome_type = get_biome_type(i, j, self.seed)
+                biome_type = self.get_biome_type(i, j, self.seed)
                 biome_instance = BiomeInstance(biome_center[0], biome_center[1], biome_type)
                 biomes.append(biome_instance)
         return biomes
@@ -114,9 +118,10 @@ class BiomeGenerator:
                 closest_biome_id = i
         return [(1, biomes[closest_biome_id].biome_type)]
 
-    def generate_chunk_of_values(self, chunk_x: int, chunk_y: int, closest_biomes: List[BiomeInstance]) -> BiomeChunk:
+    def generate_chunk_of_values_slow(self, chunk_x: int, chunk_y: int,
+                                      closest_biomes: List[BiomeInstance]) -> BiomeChunk:
         """
-        Fractal chunk generation
+        Slow way to generate a chunk of values for biome map
 
         :param chunk_x: chunk x position in world
         :param chunk_y: chunk y position in world
@@ -209,10 +214,10 @@ class BiomeGenerator:
         return np.array(voronoi_image), np.array(voronoi_bordered_image)
 
     def generate_chunk_of_values_fast_voronoi(self, chunk_x: int, chunk_y: int,
-                                              closest_biomes: List[BiomeInstance],
-                                              value_maps: List[Map] = None) -> BiomeChunk:
+                                               closest_biomes: List[BiomeInstance],
+                                               value_maps: List[Map] = None) -> BiomeChunk:
         """
-        Fractal chunk generation
+        Biome chunk generation
 
         :param value_maps: TODO
         :param chunk_x: chunk x position in world
@@ -270,3 +275,15 @@ class BiomeGenerator:
 
         output_chunk = BiomeChunk(chunk_x, chunk_y, self.chunk_width, self.value_matrix)
         return output_chunk
+
+    def generate_chunk_of_values(self, chunk_x: int, chunk_y: int, value_maps: List[Map] = None) -> BiomeChunk:
+        """
+        Biome chunk generation
+
+        :param value_maps: TODO
+        :param chunk_x: chunk x position in world
+        :param chunk_y: chunk y position in world
+        :return: numpy matrix with size = [chunk_width x chunk_width]
+        """
+        closest_biomes = self.get_closest_biomes(chunk_x, chunk_y)
+        return self.generate_chunk_of_values_fast_voronoi(chunk_x, chunk_y, closest_biomes, value_maps)
