@@ -76,18 +76,18 @@ if __name__ == '__main__':
     height_map = Map(seed, chunk_width=chunk_width)
     generator = FractalGenerator(height_map.seed, chunk_width, base_grid_distance, base_grid_max_value)
     start = time.process_time()
-    for i in range(bounding.left, bounding.right):
-        for j in range(bounding.bottom, bounding.top):
-            height_map.set_chunk(ValueChunk(i, j, tiles=generator.generate_chunk_of_values(i, j)))
+    bounding.for_each(lambda x, y:
+                      height_map.set_chunk(ValueChunk(x, y, tiles=generator.generate_chunk_of_values(x, y))))
     print(time.process_time() - start, 'seconds', '(heightmap)')
     save_height_map_as_image(height_map, 'heightmap', max_color_value=1.5 * base_grid_max_value)
 
     shift_map = Map(seed + 1, chunk_width=chunk_width)
     shift_generator = FractalGenerator(shift_map.seed, chunk_width, base_grid_distance, 1)
     start = time.process_time()
-    for i in range(bounding.left, bounding.right + 1):
-        for j in range(bounding.bottom, bounding.top):
-            shift_map.set_chunk(ValueChunk(i, j, tiles=shift_generator.generate_chunk_of_values(i, j)))
+    wider_bounding = Bounding(0, 0, 1, 0)
+    wider_bounding.add_bounding(bounding)
+    wider_bounding.for_each(lambda x, y:
+                            shift_map.set_chunk(ValueChunk(x, y, tiles=shift_generator.generate_chunk_of_values(x, y))))
     print(time.process_time() - start, 'seconds', '(shift_map)')
     save_height_map_as_image(shift_map, 'shift_map', max_color_value=1.5 * base_grid_max_value)
 
@@ -104,14 +104,15 @@ if __name__ == '__main__':
     print(time.process_time() - start, 'seconds', '(biome map)')
     save_biome_map_as_image(biome_map, 'biomes_map')
 
+    def modify_heightmap_chunk(x: int, y: int):
+        modified_chunk_values = modifier.modify_heightmap_chunk(x, y,
+                                                                height_map.get_chunk(x, y),
+                                                                biome_map.get_chunk(x, y))
+        height_map.set_chunk(ValueChunk(x, y, tiles=modified_chunk_values))
+
     modifier = MapModifier(biome_map.seed, chunk_width)
     start = time.process_time()
-    for i in range(bounding.left, bounding.right):
-        for j in range(bounding.bottom, bounding.top):
-            modified_chunk_values = modifier.modify_heightmap_chunk(i, j,
-                                                                    height_map.get_chunk(i, j),
-                                                                    biome_map.get_chunk(i, j))
-            height_map.set_chunk(ValueChunk(i, j, tiles=modified_chunk_values))
+    bounding.for_each(modify_heightmap_chunk)
     print(time.process_time() - start, 'seconds', '(modified heightmap)')
     print(f'seed = {height_map.seed}')
     print(height_map.number_of_generated_chunks(), height_map.number_of_generated_tiles())

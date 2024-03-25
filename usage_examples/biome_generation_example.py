@@ -26,7 +26,6 @@ def get_random_biome_example(biome_node_x: int, biome_node_y: int, seed: int) ->
 
 
 if __name__ == '__main__':
-
     # chunk_width = 16
     chunk_width = 32
     # chunk_width = 64
@@ -65,21 +64,22 @@ if __name__ == '__main__':
     shift_map = Map(seed + 1, chunk_width=chunk_width)
     shift_generator = FractalGenerator(shift_map.seed, chunk_width, base_grid_distance, base_grid_max_value)
     start = time.process_time()
-    for i in range(bounding.left, bounding.right + 1):
-        for j in range(bounding.bottom, bounding.top):
-            shift_map.set_chunk(ValueChunk(i, j, tiles=shift_generator.generate_chunk_of_values(i, j)))
+    wider_bounding = Bounding(0, 0, 1, 0)
+    wider_bounding.add_bounding(bounding)
+    wider_bounding.for_each(lambda x, y:
+                            shift_map.set_chunk(ValueChunk(x, y, tiles=shift_generator.generate_chunk_of_values(x, y))))
     print(time.process_time() - start, 'seconds', '(shift_map)')
     save_height_map_as_image(shift_map, 'shift_map', max_color_value=1.5 * base_grid_max_value)
 
-    start = time.process_time()
-    for i in range(bounding.left, bounding.right):
-        for j in range(bounding.bottom, bounding.top):
-            # print(i, j)
-            closest_biomes = biome_generator.get_closes_biomes(i, j, get_random_biome_example)
-            print(i, j, len(closest_biomes), 'closest_biomes')
+    def generate_biomes_chunk(x: int, y: int):
+        closest_biomes = biome_generator.get_closes_biomes(x, y, get_random_biome_example)
+        print(x, y, len(closest_biomes), 'closest_biomes')
 
-            chunk = biome_generator.generate_chunk_of_values_fast_voronoi(i, j, closest_biomes, [shift_map])
-            biome_map.set_chunk(chunk)
+        chunk = biome_generator.generate_chunk_of_values_fast_voronoi(x, y, closest_biomes, [shift_map])
+        biome_map.set_chunk(chunk)
+
+    start = time.process_time()
+    bounding.for_each(generate_biomes_chunk)
     print(time.process_time() - start, 'seconds')
     print(biome_map.number_of_generated_chunks(), biome_map.number_of_generated_tiles())
     save_biome_map_as_image(biome_map, 'tst_biomes')
