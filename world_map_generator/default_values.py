@@ -1,5 +1,5 @@
 # Version
-FRACTAL_GENERATOR_VERSION = '0.1.1'
+FRACTAL_GENERATOR_VERSION = '0.2.0'
 
 # General generators parameters
 TILES_IN_CHUNK = 64

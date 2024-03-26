@@ -7,6 +7,14 @@ from world_map_generator.map.biome import BASE_BIOME_TYPE, BiomeType
 
 
 class Chunk:
+    """Chunk with tiles packed in numpy matrix.
+
+    Attributes:
+        x               Global x position in chunk grid of the map.
+        y               Global y position in chunk grid of the map.
+        chunk_width     Tiles matrix size. Tile matrix size which should be [chunk_width x chunk_width].
+        tiles           Matrix of float values packed in numpy matrix with size [chunk_width x chunk_width].
+    """
 
     def __init__(self, x: int, y: int, chunk_width: Optional[int] = TILES_IN_CHUNK,
                  tiles: Optional[List[List[float]]] = None):

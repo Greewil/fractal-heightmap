@@ -8,6 +8,15 @@ def base_height_modification(h: float, biome_parameters: Optional[dict] = None) 
 
 
 class BiomeType:
+    """ Type of biome instance.
+
+    Attributes:
+        title                   The title of the biome type.
+        height_modification     Method which will be used to modify heightmap values at this biome type.
+        biome_parameters        Dict of some additional parameters (f.e. appearance_weight).
+        rendering_color         RGB color which will be used in rendering.
+                                If rendering_color is None, the color will be selected randomly.
+    """
 
     def __init__(self,
                  title: str,
@@ -31,11 +40,11 @@ class BiomeType:
 
 
 class BiomeInstance:
-    """Chunk with information about bioms types and their weights in tiles.
+    """ Biome type with specified position.
 
     Attributes:
-        x               Global x position in tiles.
-        y               Global y position in tiles.
+        x               Global x position in biome chunks.
+        y               Global y position in biome chunks.
         biome_type      Type of current biome.
     """
 

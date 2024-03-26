@@ -9,6 +9,15 @@ from world_map_generator.utils import get_position_seed, is_power_of_two
 
 
 class MapModifier:
+    """ Heightmap modifier which uses biomes map to apply corresponding height_modification.
+
+    Attributes:
+        seed               Number which is used in procedural generation.
+                           If it wasn't specified it will be generated randomly.
+        chunk_width        Chunk size which defines tiles matrix.
+                           Tile matrix size which should be [chunk_width x chunk_width].
+                           Chunk width should be the power of 2.
+    """
 
     def __init__(self, seed: Optional[int] = None, chunk_width: Optional[int] = TILES_IN_CHUNK) -> None:
         if seed is None:
@@ -44,7 +53,9 @@ class MapModifier:
     def modify_heightmap_chunk(self, chunk_x: int, chunk_y: int,
                                heightmap_chunk: ValueChunk,
                                biome_chunk: BiomeChunk):
+        """ TODO """
         # self._generate_random_sequence(chunk_x, chunk_y)
+        # TODO force height_modification to use either seed or generated random value
         self._clean_value_matrix()
 
         for x in range(self.chunk_width):

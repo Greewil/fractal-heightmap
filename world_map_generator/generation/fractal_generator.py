@@ -10,6 +10,23 @@ from world_map_generator.utils import get_position_seed, is_power_of_two
 
 
 class FractalGenerator:
+    """ Generator of value map chunks based on diamond square algorithm.
+
+    Attributes:
+        seed                        Number which is used in procedural generation.
+                                    If it wasn't specified it will be generated randomly.
+        chunk_width                 Chunk size which defines tiles matrix.
+                                    Tile matrix size which should be [chunk_width x chunk_width].
+                                    Chunk width should be the power of 2.
+        base_grid_distance          Distance between two closest base grid points.
+                                    Base grid distance should be the power of 2.
+        base_grid_max_value         Max value which could be set in base grid values.
+
+        chunks_in_base_grid_step    Full chunk_widths in base_grid_step.
+        value_matrix_width_chunks   Full chunk_widths in value matrix size.
+        value_matrix_width_tiles    value_matrix size in tiles.
+        steps_impact_radii          TODO
+    """
 
     def __init__(self, seed: Optional[int] = None, chunk_width: Optional[int] = TILES_IN_CHUNK,
                  base_grid_distance: Optional[int] = DIAMOND_SQUARE_GRID_STEP,
@@ -66,7 +83,7 @@ class FractalGenerator:
         return self._base_grid_max_value
 
     def _get_chunks_bounding(self, chunk_x: int, chunk_y: int) -> Bounding:
-        """ TODO """
+        """ Returns the bounding of all chunks which are contain points for diamond square chunk generation. """
         grid_corner_x = chunk_x % self.chunks_in_base_grid_step
         grid_corner_y = chunk_y % self.chunks_in_base_grid_step
         return Bounding(chunk_x - grid_corner_x - self.chunks_in_base_grid_step,
@@ -75,7 +92,7 @@ class FractalGenerator:
                         chunk_y - grid_corner_y + 3 * self.chunks_in_base_grid_step)
 
     def _generate_random_sequence(self, bounding: Bounding):
-        """ TODO """
+        """ Generates random sequence that will be needed for base grid generation and diamond square steps. """
         randoms_matrix = []
         i = 0
         for x in range(bounding.left, bounding.right + 1):
@@ -88,19 +105,31 @@ class FractalGenerator:
         self._random_sequence = np.bmat(randoms_matrix)
 
     def _clean_value_matrix(self):
-        """ TODO """
+        """ Sets values of value_matrix (matrix of all values needed to generate one chunk) to zeros. """
         self.value_matrix = np.full((self.value_matrix_width_tiles, self.value_matrix_width_tiles), 0.0)
 
     def _generate_base_grid(self):
-        """ TODO """
+        """ Generates base grid in value_matrix with use of _random_sequence. """
         for i in range(self.value_matrix_width_tiles // self.base_grid_distance):
             for j in range(self.value_matrix_width_tiles // self.base_grid_distance):
                 x = i * self.base_grid_distance
                 y = j * self.base_grid_distance
                 self.value_matrix[x, y] = self._random_sequence[x, y] * self.base_grid_max_value
 
-    def _diamond_square_step(self, step, target_left: int, target_bottom: int, target_right: int, target_top: int):
-        """ TODO """
+    def _diamond_square_step(self, step: int, target_left: int, target_bottom: int, target_right: int, target_top: int):
+        """
+        One iteration of diamond square algorithm during which number of generated points will be doubled.
+        :param step: current diamond square step number (where first should be equals to self.base_grid_steps - 1
+                     and last step in chunk generation should be 0)
+        :param target_left: left x bounding coordinate of currently generating chunk
+                            (in relative to the value_matrix coordinates)
+        :param target_bottom: bottom y bounding coordinate of currently generating chunk
+                              (in relative to the value_matrix coordinates)
+        :param target_right: right x bounding coordinate of currently generating chunk
+                             (in relative to the value_matrix coordinates)
+        :param target_top: top y bounding coordinate of currently generating chunk
+                           (in relative to the value_matrix coordinates)
+        """
         step_size = 2 ** step
         step_size_double = 2 * step_size
         radii = self.steps_impact_radii[step]

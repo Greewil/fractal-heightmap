@@ -5,8 +5,6 @@ from typing import AnyStr, Optional, Callable
 
 class Bounding:
 
-    # TODO for each (i,j) in bounding
-
     @classmethod
     def update_max_min(cls, x, y, bounding: Bounding):
         if x < bounding.left:

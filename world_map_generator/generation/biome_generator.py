@@ -19,6 +19,18 @@ def get_base_biome_type(biome_node_x: int, biome_node_y: int, seed: int) -> Biom
 
 
 class BiomeGenerator:
+    """ Generator of biome map chunks based on voronoi algorithm.
+
+    Attributes:
+        seed                    Number which is used in procedural generation.
+                                If it wasn't specified it will be generated randomly.
+        chunk_width             Chunk size which defines tiles matrix.
+                                Tile matrix size which should be [chunk_width x chunk_width].
+                                Chunk width should be the power of 2.
+        biome_grid_step         TODO
+        biome_blend_radios      TODO
+        get_biome_type          Method which contains logic about biome type placement on map.
+    """
 
     def __init__(self, seed: Optional[int] = None, chunk_width: Optional[int] = TILES_IN_CHUNK,
                  biome_grid_step: Optional[int] = BIOME_GRID_STEP,
@@ -67,7 +79,7 @@ class BiomeGenerator:
         return self._random_sequence
 
     def _clean_value_matrix(self):
-        """ TODO """
+        """ Sets values of value_matrix (matrix of chunk_width size need for generation) to zeros. """
         self.value_matrix = []
         for i in range(self.chunk_width):
             self.value_matrix.append([])
@@ -75,7 +87,10 @@ class BiomeGenerator:
                 self.value_matrix[i].append([])
 
     def get_closes_biomes_bounding(self, chunk_x: int, chunk_y: int) -> Bounding:
-        """ TODO """
+        """
+        Returns the bounding for biome instances which are close enough to impact chunk generation
+        in specified coordinates.
+        """
         biome_grid_left_x = (chunk_x * self.chunk_width // self.biome_grid_step) - 2
         biome_grid_bottom_y = (chunk_y * self.chunk_width // self.biome_grid_step) - 2
         biome_grid_right_x = ((chunk_x + 1) * self.chunk_width // self.biome_grid_step) + 2
@@ -83,7 +98,7 @@ class BiomeGenerator:
         return Bounding(biome_grid_left_x, biome_grid_bottom_y, biome_grid_right_x, biome_grid_top_y)
 
     def get_biome_center(self, biome_node_x: int, biome_node_y: int) -> Tuple[float, float]:
-        """ TODO """
+        """ Returns biome center position which will be the center of voronoi cell. """
         pos_seed = get_position_seed(biome_node_x, biome_node_y, self.seed)
         np.random.seed(pos_seed)
         rnd = np.random.rand(2)
@@ -92,7 +107,7 @@ class BiomeGenerator:
         return biome_center_x, biome_center_y
 
     def get_closest_biomes(self, chunk_x: int, chunk_y: int) -> List[BiomeInstance]:
-        """ TODO """
+        """ Returns list of biome instances which are close enough to impact chunk generation. """
         biome_grid_bounding = self.get_closes_biomes_bounding(chunk_x, chunk_y)
         biomes = []
         for i in range(biome_grid_bounding.left, biome_grid_bounding.right + 1):
@@ -105,7 +120,7 @@ class BiomeGenerator:
 
     def _get_closest_biomes_mix(self, tile_x: int, tile_y: int,
                                 biomes: List[BiomeInstance]) -> List[Tuple[float, BiomeType]]:
-        """ TODO """
+        """ Returns biomes mix which contains only biome which center is closest to specified tile. """
         min_dist = 5 * self.biome_grid_step * self.biome_grid_step
         closest_biome_id = 0
         biome_distances = np.full(len(biomes), 0.0)
@@ -140,23 +155,6 @@ class BiomeGenerator:
 
         output_chunk = BiomeChunk(chunk_x, chunk_y, self.chunk_width, self.value_matrix)
         return output_chunk
-
-    def _calculate_blending_point(self, x: int, y: int,
-                                  biome_image_matrix,
-                                  blending_point_code: int = 255) -> dict:
-        """ TODO """
-        closest_biomes_dict = {}
-        for i in range(x - self.biome_blend_radios, x + self.biome_blend_radios + 1):
-            for j in range(y - self.biome_blend_radios, y + self.biome_blend_radios + 1):
-                cur_biome = biome_image_matrix[i, j]
-                if cur_biome != blending_point_code:
-                    dx, dy = x - i, y - j
-                    quad_dist = dx * dx + dy * dy
-                    if closest_biomes_dict.get(cur_biome) is None:
-                        closest_biomes_dict[cur_biome] = quad_dist
-                    elif quad_dist < closest_biomes_dict[cur_biome]:
-                        closest_biomes_dict[cur_biome] = quad_dist
-        return closest_biomes_dict
 
     def _get_central_points(self, closest_biomes: List[BiomeInstance],
                             output_chunk_left: int,
@@ -214,15 +212,15 @@ class BiomeGenerator:
         return np.array(voronoi_image), np.array(voronoi_bordered_image)
 
     def generate_chunk_of_values_fast_voronoi(self, chunk_x: int, chunk_y: int,
-                                               closest_biomes: List[BiomeInstance],
-                                               value_maps: List[Map] = None) -> BiomeChunk:
+                                              closest_biomes: List[BiomeInstance],
+                                              value_maps: List[Map] = None) -> BiomeChunk:
         """
         Biome chunk generation
 
-        :param value_maps: TODO
+        :param value_maps: list of Map instances which would be used for biome generation (min 1 additional map)
         :param chunk_x: chunk x position in world
         :param chunk_y: chunk y position in world
-        :param closest_biomes: TODO
+        :param closest_biomes: list of biome instances which are close enough to impact chunk generation.
         :return: numpy matrix with size = [chunk_width x chunk_width]
         """
         self._clean_value_matrix()
@@ -280,7 +278,7 @@ class BiomeGenerator:
         """
         Biome chunk generation
 
-        :param value_maps: TODO
+        :param value_maps: list of Map instances which would be used for biome generation (min 1 additional map)
         :param chunk_x: chunk x position in world
         :param chunk_y: chunk y position in world
         :return: numpy matrix with size = [chunk_width x chunk_width]

@@ -7,6 +7,16 @@ from .chunk import Chunk
 
 
 class Map:
+    """ Collection of chunks, which are generated with specified seed.
+
+    Attributes:
+        seed               Number which is used in procedural generation.
+                           If it wasn't specified it will be generated randomly.
+        chunk_width        Chunk size which defines tiles matrix.
+                           Tile matrix size which should be [chunk_width x chunk_width].
+                           Chunk width should be the power of 2.
+        chunks             Dict of chunks where hash based on chunk position (str((x, y))).
+    """
 
     def __init__(self, seed: Optional[int] = None, chunk_width: Optional[int] = TILES_IN_CHUNK):
         self._chunk_width = chunk_width
