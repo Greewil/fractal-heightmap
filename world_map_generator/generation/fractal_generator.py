@@ -25,7 +25,13 @@ class FractalGenerator:
         chunks_in_base_grid_step    Full chunk_widths in base_grid_step.
         value_matrix_width_chunks   Full chunk_widths in value matrix size.
         value_matrix_width_tiles    value_matrix size in tiles.
-        steps_impact_radii          TODO
+        steps_impact_radii          Array of tuples with impact radii on each step of diamond square algorithm.
+                                    Impact radius is a maximum radius which you should take into account to calculate
+                                    point value in diamond square algorithm.
+                                    First element of array will contain radii for first step in diamond square,
+                                    second element for second step etc.
+                                    First element in tuple is radius for x-shape in diamond square
+                                    and second element in tuple is radius for x-shape.
     """
 
     def __init__(self, seed: Optional[int] = None, chunk_width: Optional[int] = TILES_IN_CHUNK,

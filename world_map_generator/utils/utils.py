@@ -64,7 +64,7 @@ def get_cumulative_distribution_list(weights: List[float]) -> List[float]:
     return cumulative_distribution
 
 
-# TODO can be O(n) instead of O(log(n)) using Alias Method (https://www.keithschwarz.com/darts-dice-coins/)
+# can be O(n) instead of O(log(n)) using Alias Method (https://www.keithschwarz.com/darts-dice-coins/)
 # but it's ok for now :)
 def weighted_selection_by_parameter(cumulative_distribution_list: List[float], selector_value: float = 0) -> int:
     if len(cumulative_distribution_list) == 0:

@@ -27,8 +27,10 @@ class BiomeGenerator:
         chunk_width             Chunk size which defines tiles matrix.
                                 Tile matrix size which should be [chunk_width x chunk_width].
                                 Chunk width should be the power of 2.
-        biome_grid_step         TODO
-        biome_blend_radios      TODO
+        biome_grid_step         Distance between two closest base grid biome region centers.
+                                Near one biome region center will be created biome center
+                                and biome area will be determined with voronoi algorithm.
+        biome_blend_radios      Width of biome blending line in which biomes will be mixed together.
         get_biome_type          Method which contains logic about biome type placement on map.
     """
 

@@ -52,8 +52,16 @@ class MapModifier:
 
     def modify_heightmap_chunk(self, chunk_x: int, chunk_y: int,
                                heightmap_chunk: ValueChunk,
-                               biome_chunk: BiomeChunk):
-        """ TODO """
+                               biome_chunk: BiomeChunk) -> np.ndarray:
+        """
+        From heightmap_chunk create chunk of modified heights according to biome chunk modification functions.
+
+        :param chunk_x: chunk x position in world
+        :param chunk_y: chunk y position in world
+        :param heightmap_chunk: heightmap chunk from which will be created modified chunk.
+        :param biome_chunk: biome chunk which will be used to modify heightmap (using height_modification methods).
+        :return: modified heightmap chunk values (numpy matrix of size [chunk_width x chunk_width]).
+        """
         # self._generate_random_sequence(chunk_x, chunk_y)
         # TODO force height_modification to use either seed or generated random value
         self._clean_value_matrix()
