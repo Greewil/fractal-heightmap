@@ -213,9 +213,9 @@ class BiomeGenerator:
                                                   width=int(0.5 * self.biome_blend_radios))
         return np.array(voronoi_image), np.array(voronoi_bordered_image)
 
-    def generate_chunk_of_values_fast_voronoi(self, chunk_x: int, chunk_y: int,
-                                              closest_biomes: List[BiomeInstance],
-                                              value_maps: List[Map] = None) -> BiomeChunk:
+    def generate_chunk_fast_voronoi(self, chunk_x: int, chunk_y: int,
+                                    closest_biomes: List[BiomeInstance],
+                                    value_maps: List[Map] = None) -> BiomeChunk:
         """
         Biome chunk generation
 
@@ -276,14 +276,14 @@ class BiomeGenerator:
         output_chunk = BiomeChunk(chunk_x, chunk_y, self.chunk_width, self.value_matrix)
         return output_chunk
 
-    def generate_chunk_of_values(self, chunk_x: int, chunk_y: int, value_maps: List[Map] = None) -> BiomeChunk:
+    def generate_chunk(self, chunk_x: int, chunk_y: int, value_maps: List[Map] = None) -> BiomeChunk:
         """
         Biome chunk generation
 
         :param value_maps: list of Map instances which would be used for biome generation (min 1 additional map)
         :param chunk_x: chunk x position in world
         :param chunk_y: chunk y position in world
-        :return: numpy matrix with size = [chunk_width x chunk_width]
+        :return: biome chunk with size = [chunk_width x chunk_width]
         """
         closest_biomes = self.get_closest_biomes(chunk_x, chunk_y)
-        return self.generate_chunk_of_values_fast_voronoi(chunk_x, chunk_y, closest_biomes, value_maps)
+        return self.generate_chunk_fast_voronoi(chunk_x, chunk_y, closest_biomes, value_maps)

@@ -67,8 +67,7 @@ if __name__ == '__main__':
     start = time.process_time()
     wider_bounding = Bounding(0, 0, 1, 0)
     wider_bounding.add_bounding(bounding)
-    wider_bounding.for_each(lambda x, y:
-                            shift_map.set_chunk(ValueChunk(x, y, tiles=shift_generator.generate_chunk_of_values(x, y))))
+    wider_bounding.for_each(lambda x, y: shift_map.set_chunk(shift_generator.generate_chunk(x, y)))
     print(time.process_time() - start, 'seconds', '(shift_map)')
     save_height_map_as_image(shift_map, 'shift_map', max_color_value=1.5 * base_grid_max_value)
 
@@ -76,7 +75,7 @@ if __name__ == '__main__':
         closest_biomes = biome_generator.get_closest_biomes(x, y)
         print(x, y, len(closest_biomes), 'closest_biomes')
 
-        chunk = biome_generator.generate_chunk_of_values_fast_voronoi(x, y, closest_biomes, [shift_map])
+        chunk = biome_generator.generate_chunk_fast_voronoi(x, y, closest_biomes, [shift_map])
         biome_map.set_chunk(chunk)
 
     start = time.process_time()

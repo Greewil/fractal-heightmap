@@ -1,4 +1,4 @@
-from typing import AnyStr, Optional, List, Tuple
+from typing import AnyStr, Optional, List, Tuple, Any
 
 import numpy as np
 
@@ -17,7 +17,7 @@ class Chunk:
     """
 
     def __init__(self, x: int, y: int, chunk_width: Optional[int] = TILES_IN_CHUNK,
-                 tiles: Optional[List[List[float]]] = None):
+                 tiles: Optional[np.ndarray[Any, np.dtype]] = None):
         self.position = (x, y)
         self._chunk_width = chunk_width
         if tiles is not None:
@@ -60,7 +60,10 @@ class ValueChunk(Chunk):
     """
 
     def __init__(self, x: int, y: int, chunk_width: Optional[int] = TILES_IN_CHUNK,
-                 tiles: Optional[List[List[float]]] = None):
+                 tiles: Optional[np.ndarray[Any, np.dtype]] = None):
+        if tiles is not None:
+            pass
+            # TODO handle situations in which tiles are not [chunk_width x chunk_width] size
         super().__init__(x, y, chunk_width, tiles)
         if self.tiles is None:
             self.tiles = np.full((self.chunk_width, self.chunk_width), 0.0)

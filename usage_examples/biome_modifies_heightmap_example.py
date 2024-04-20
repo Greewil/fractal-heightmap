@@ -76,8 +76,7 @@ if __name__ == '__main__':
     height_map = Map(seed, chunk_width=chunk_width)
     generator = FractalGenerator(height_map.seed, chunk_width, base_grid_distance, base_grid_max_value)
     start = time.process_time()
-    bounding.for_each(lambda x, y:
-                      height_map.set_chunk(ValueChunk(x, y, tiles=generator.generate_chunk_of_values(x, y))))
+    bounding.for_each(lambda x, y: height_map.set_chunk(generator.generate_chunk(x, y)))
     print(time.process_time() - start, 'seconds', '(heightmap)')
     save_height_map_as_image(height_map, 'heightmap', max_color_value=1.5 * base_grid_max_value)
 
@@ -86,8 +85,7 @@ if __name__ == '__main__':
     start = time.process_time()
     wider_bounding = Bounding(0, 0, 1, 0)
     wider_bounding.add_bounding(bounding)
-    wider_bounding.for_each(lambda x, y:
-                            shift_map.set_chunk(ValueChunk(x, y, tiles=shift_generator.generate_chunk_of_values(x, y))))
+    wider_bounding.for_each(lambda x, y: shift_map.set_chunk(shift_generator.generate_chunk(x, y)))
     print(time.process_time() - start, 'seconds', '(shift_map)')
     save_height_map_as_image(shift_map, 'shift_map', max_color_value=1.5 * base_grid_max_value)
 
@@ -95,8 +93,7 @@ if __name__ == '__main__':
     biome_generator = BiomeGenerator(biome_map.seed, chunk_width, biome_grid_step, biome_blend_radios,
                                      get_random_biome_example)
     start = time.process_time()
-    bounding.for_each(lambda x, y:
-                      biome_map.set_chunk(biome_generator.generate_chunk_of_values(x, y, [shift_map])))
+    bounding.for_each(lambda x, y: biome_map.set_chunk(biome_generator.generate_chunk(x, y, [shift_map])))
     print(time.process_time() - start, 'seconds', '(biome map)')
     save_biome_map_as_image(biome_map, 'biomes_map')
 

@@ -1,10 +1,11 @@
 import math
-from typing import Optional
+from typing import Optional, Any
 
 import numpy as np
 
 from world_map_generator.default_values import TILES_IN_CHUNK, DIAMOND_SQUARE_GRID_STEP, \
     DIAMOND_SQUARE_BASE_GRID_MAX_VALUE
+from world_map_generator.map.chunk import ValueChunk
 from world_map_generator.utils import Bounding, get_random_seed
 from world_map_generator.utils import get_position_seed, is_power_of_two
 
@@ -177,9 +178,9 @@ class FractalGenerator:
             cur_x += step_size
             i += 1
 
-    def generate_chunk_of_values(self, chunk_x: int, chunk_y: int):
+    def generate_value_matrix(self, chunk_x: int, chunk_y: int) -> np.ndarray[Any, np.dtype]:
         """
-        Fractal chunk generation
+        Fractal generation of tiles in chunk.
         :param chunk_x: chunk x position in world
         :param chunk_y: chunk y position in world
         :return: numpy matrix with size = [chunk_width x chunk_width]
@@ -200,3 +201,12 @@ class FractalGenerator:
 
         ountput_matrix = self.value_matrix[output_chunk_left:output_chunk_right, output_chunk_bottom:output_chunk_top]
         return ountput_matrix
+
+    def generate_chunk(self, chunk_x: int, chunk_y: int) -> ValueChunk:
+        """
+        Fractal chunk generation
+        :param chunk_x: chunk x position in world
+        :param chunk_y: chunk y position in world
+        :return: chunk of values [chunk_width x chunk_width]
+        """
+        return ValueChunk(chunk_x, chunk_y, self.chunk_width, self.generate_value_matrix(chunk_x, chunk_y))
