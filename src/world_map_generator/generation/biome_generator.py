@@ -38,6 +38,18 @@ class BiomeGenerator:
                  biome_grid_step: Optional[int] = BIOME_GRID_STEP,
                  biome_blend_radios: Optional[int] = BIOME_BLEND_RADIOS,
                  get_biome_type: Callable[[int, int, int], BiomeType] = get_base_biome_type):
+        """ Generator of biome map chunks based on voronoi algorithm.
+        :param seed:                Number which is used in procedural generation.
+                                    If it wasn't specified it will be generated randomly.
+        :param chunk_width:         Chunk size which defines tiles matrix.
+                                    Tile matrix size which should be [chunk_width x chunk_width].
+                                    Chunk width should be the power of 2.
+        :param biome_grid_step:     Distance between two closest base grid biome region centers.
+                                    Near one biome region center will be created biome center
+                                    and biome area will be determined with voronoi algorithm.
+        :param biome_blend_radios:  Width of biome blending line in which biomes will be mixed together.
+        :param get_biome_type:      Method which contains logic about biome type placement on map.
+        """
         if seed is None:
             self.seed = get_random_seed()
         else:

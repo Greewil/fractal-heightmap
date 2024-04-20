@@ -19,6 +19,13 @@ class Map:
     """
 
     def __init__(self, seed: Optional[int] = None, chunk_width: Optional[int] = TILES_IN_CHUNK):
+        """ Collection of chunks, which are generated with specified seed.
+        :param seed:        Number which is used in procedural generation.
+                            If it wasn't specified it will be generated randomly.
+        :param chunk_width: Chunk size which defines tiles matrix.
+                            Tile matrix size which should be [chunk_width x chunk_width].
+                            Chunk width should be the power of 2.
+        """
         self._chunk_width = chunk_width
         if seed is None:
             self._seed = get_random_seed()

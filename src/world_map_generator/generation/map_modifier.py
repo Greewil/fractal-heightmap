@@ -20,6 +20,13 @@ class MapModifier:
     """
 
     def __init__(self, seed: Optional[int] = None, chunk_width: Optional[int] = TILES_IN_CHUNK) -> None:
+        """ Heightmap modifier which uses biomes map to apply corresponding height_modification.
+        :param seed:        Number which is used in procedural generation.
+                            If it wasn't specified it will be generated randomly.
+        :param chunk_width: Chunk size which defines tiles matrix.
+                            Tile matrix size which should be [chunk_width x chunk_width].
+                            Chunk width should be the power of 2.
+        """
         if seed is None:
             self.seed = get_random_seed()
         else:

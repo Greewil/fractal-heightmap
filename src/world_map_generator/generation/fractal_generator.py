@@ -38,6 +38,16 @@ class FractalGenerator:
     def __init__(self, seed: Optional[int] = None, chunk_width: Optional[int] = TILES_IN_CHUNK,
                  base_grid_distance: Optional[int] = DIAMOND_SQUARE_GRID_STEP,
                  base_grid_max_value: Optional[float] = DIAMOND_SQUARE_BASE_GRID_MAX_VALUE) -> None:
+        """ Generator of value map chunks based on diamond square algorithm.
+        :param seed:                Number which is used in procedural generation.
+                                    If it wasn't specified it will be generated randomly.
+        :param chunk_width:         Chunk size which defines tiles matrix.
+                                    Tile matrix size which should be [chunk_width x chunk_width].
+                                    Chunk width should be the power of 2.
+        :param base_grid_distance:  Distance between two closest base grid points.
+                                    Base grid distance should be the power of 2.
+        :param base_grid_max_value: Max value which could be set in base grid values.
+        """
         if seed is None:
             self.seed = get_random_seed()
         else:

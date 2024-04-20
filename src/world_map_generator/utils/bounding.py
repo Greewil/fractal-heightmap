@@ -23,6 +23,9 @@ class Bounding:
         self.bottom = bottom
 
     def get_wider_bounding(self, additional_size: Optional[int] = 1):
+        """
+        :return: chunk of values which is large in any direction on additional_size.
+        """
         return Bounding(self.left - additional_size, self.bottom - additional_size, self.right + additional_size,
                         self.top + additional_size)
 

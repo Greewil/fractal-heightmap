@@ -4,7 +4,6 @@ import time
 from world_map_generator.generation import BiomeGenerator, FractalGenerator
 from world_map_generator.map import Map
 from world_map_generator.map.biome import BiomeType
-from world_map_generator.map.chunk import ValueChunk
 from world_map_generator.rendering import save_biome_map_as_image, save_height_map_as_image
 from world_map_generator.utils import get_position_seed, weighted_random_selection, get_cumulative_distribution_list, \
     Bounding

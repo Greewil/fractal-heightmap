@@ -2,7 +2,6 @@ import time
 
 from world_map_generator.generation import FractalGenerator
 from world_map_generator.map import Map
-from world_map_generator.map.chunk import ValueChunk
 from world_map_generator.rendering import save_height_map_as_image
 
 if __name__ == '__main__':

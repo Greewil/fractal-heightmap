@@ -23,6 +23,13 @@ class BiomeType:
                  height_modification: Optional[Callable[[float, dict], float]] = base_height_modification,
                  biome_parameters: Optional[dict] = None,
                  rendering_color: Optional[Tuple[int, int, int]] = None):
+        """ Type of biome instance.
+        :param title:                   The title of the biome type.
+        :param height_modification:     Method which will be used to modify heightmap values at this biome type.
+        :param biome_parameters:        Dict of some additional parameters (f.e. appearance_weight).
+        :param rendering_color:         RGB color which will be used in rendering.
+                                        If rendering_color is None, the color will be selected randomly.
+        """
         if title is None:
             raise Exception("title should be specified!")
         self.title = title
@@ -43,12 +50,17 @@ class BiomeInstance:
     """ Biome type with specified position.
 
     Attributes:
-        x               Global x position in biome chunks.
-        y               Global y position in biome chunks.
+        x               Global x position in biome chunk grid.
+        y               Global y position in biome chunk grid.
         biome_type      Type of current biome.
     """
 
     def __init__(self, x: float, y: float, biome_type: BiomeType):
+        """ Biome type with specified position.
+        :param x:               Global x position in biome chunk grid.
+        :param y:               Global y position in biome chunk grid.
+        :param biome_type:      Type of current biome.
+        """
         self.x = x
         self.y = y
         self.biome_type = biome_type
