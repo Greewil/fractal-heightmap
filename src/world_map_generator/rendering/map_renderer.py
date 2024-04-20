@@ -57,9 +57,21 @@ def _get_biomes_color(biomes: List[Tuple[float, BiomeType]],
 
 def save_height_map_as_image(height_map: Map, image_name: AnyStr, bounding: Bounding = None,
                              max_color_value: Optional[float] = 255):
+    """ Render and save heightmap region as png image.
+    :param height_map: Heightmap to save.
+    :param image_name: Name of the image file.
+    :param bounding: Rectangle bounding of the map to save (in chunks).
+                     If it wasn't specified it will be set as bounding of the whole specified map.
+    :param max_color_value: Max height of rendering region which corresponds to white color.
+    """
     _save_map_as_image(height_map, image_name, _get_height_color, bounding, max_color_value)
 
 
-def save_biome_map_as_image(biome_map: Map, image_name: AnyStr, bounding: Bounding = None,
-                            max_color_value: Optional[float] = 255):
-    _save_map_as_image(biome_map, image_name, _get_biomes_color, bounding, max_color_value)
+def save_biome_map_as_image(biome_map: Map, image_name: AnyStr, bounding: Bounding = None):
+    """ Render and save biome map region as png image.
+    :param biome_map: Biome map to save.
+    :param image_name: Name of the image file.
+    :param bounding: Rectangle bounding of the map to save (in chunks).
+                     If it wasn't specified it will be set as bounding of the whole specified map.
+    """
+    _save_map_as_image(biome_map, image_name, _get_biomes_color, bounding, 255)
