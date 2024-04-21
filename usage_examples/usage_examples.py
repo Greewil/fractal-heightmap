@@ -3,6 +3,7 @@ import time
 from world_map_generator.generation import FractalGenerator
 from world_map_generator.map import Map
 from world_map_generator.rendering import save_height_map_as_image
+from world_map_generator.utils import Bounding
 
 if __name__ == '__main__':
     chunk_width = 64
@@ -12,12 +13,12 @@ if __name__ == '__main__':
     generator = FractalGenerator(height_map.seed, chunk_width, base_grid_distance)
     print(f'seed = {height_map.seed}')
     start = time.process_time()
-    for i in range(-5, 6):
-        for j in range(-1, 10):
-            height_map.set_chunk(generator.generate_chunk(i, j))
-    # # Or you can use bounding:
-    # bounding = Bounding(-5, -1, 6, 10)
-    # bounding.for_each(lambda x, y: height_map.set_chunk(generator.generate_chunk(x, y)))
+    bounding = Bounding(0, 0, 8, 8)
+    bounding.for_each(lambda x, y: height_map.set_chunk(generator.generate_chunk(x, y)))
+    # # Its equivalent of:
+    # for i in range(0, 8):
+    #     for j in range(0, 8):
+    #         height_map.set_chunk(generator.generate_chunk(i, j))
     print(time.process_time() - start, 'seconds')
     print(height_map.number_of_generated_chunks(), height_map.number_of_generated_tiles())
     save_height_map_as_image(height_map, 'tst', max_color_value=150)

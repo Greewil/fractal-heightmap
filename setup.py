@@ -44,4 +44,6 @@ setup(
 # # Usage:
 # pip install wheel
 # python setup.py bdist_wheel sdist
+# twine check dist/*
+# twine upload -r testpypi dist/*
 # twine upload dist/*

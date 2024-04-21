@@ -1,5 +1,6 @@
 import functools
 import time
+from typing import List
 
 from world_map_generator.generation import BiomeGenerator, FractalGenerator
 from world_map_generator.generation.map_modifier import MapModifier
@@ -11,7 +12,7 @@ from world_map_generator.utils import (get_position_seed, weighted_random_select
                                        Bounding)
 
 
-def cliff_modifier(height: float, biome_parameters: dict) -> float:
+def cliff_modifier(height: float, biome_parameters: dict, value_maps_values: List[float] = None) -> float:
     if height < 50:
         return height
     else:
@@ -19,7 +20,7 @@ def cliff_modifier(height: float, biome_parameters: dict) -> float:
         return (height + drop) * 100 / (drop + 100)
 
 
-def multiply_modifier(height: float, biome_parameters: dict) -> float:
+def multiply_modifier(height: float, biome_parameters: dict, value_maps_values: List[float] = None) -> float:
     threshold = 50
     if height < threshold:
         return height
@@ -27,7 +28,7 @@ def multiply_modifier(height: float, biome_parameters: dict) -> float:
         return threshold + (height - threshold) * 1.5
 
 
-def volcano_modifier(height: float, biome_parameters: dict) -> float:
+def volcano_modifier(height: float, biome_parameters: dict, value_maps_values: List[float] = None) -> float:
     height = multiply_modifier(height, biome_parameters)
     threshold = 105
     if height < threshold:
@@ -66,7 +67,7 @@ if __name__ == '__main__':
     base_grid_max_value = 100
 
     biome_grid_step = 100
-    biome_blend_radios = 10
+    biome_blend_radios = 15
 
     seed = 52
 
@@ -87,7 +88,7 @@ if __name__ == '__main__':
     wider_bounding.add_bounding(bounding)
     wider_bounding.for_each(lambda x, y: shift_map.set_chunk(shift_generator.generate_chunk(x, y)))
     print(time.process_time() - start, 'seconds', '(shift_map)')
-    save_height_map_as_image(shift_map, 'shift_map', max_color_value=1.5 * base_grid_max_value)
+    save_height_map_as_image(shift_map, 'shift_map', max_color_value=1.5)
 
     biome_map = Map(seed, chunk_width=chunk_width)
     biome_generator = BiomeGenerator(biome_map.seed, chunk_width, biome_grid_step, biome_blend_radios,

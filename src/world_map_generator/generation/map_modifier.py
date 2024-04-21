@@ -1,9 +1,9 @@
-from typing import Optional
+from typing import Optional, List
 
 import numpy as np
 
 from world_map_generator.default_values import TILES_IN_CHUNK
-from world_map_generator.map.chunk import ValueChunk, BiomeChunk
+from world_map_generator.map.chunk import ValueChunk, BiomeChunk, Chunk
 from world_map_generator.utils import get_random_seed
 from world_map_generator.utils import get_position_seed, is_power_of_two
 
@@ -59,7 +59,8 @@ class MapModifier:
 
     def modify_heightmap_chunk(self, chunk_x: int, chunk_y: int,
                                heightmap_chunk: ValueChunk,
-                               biome_chunk: BiomeChunk) -> np.ndarray:
+                               biome_chunk: BiomeChunk,
+                               value_maps_info: List[Chunk] = None) -> np.ndarray:
         """
         From heightmap_chunk create chunk of modified heights according to biome chunk modification functions.
 
@@ -67,6 +68,7 @@ class MapModifier:
         :param chunk_y: chunk y position in world
         :param heightmap_chunk: heightmap chunk from which will be created modified chunk.
         :param biome_chunk: biome chunk which will be used to modify heightmap (using height_modification methods).
+        :param value_maps_info: list of Map instances which would be used for biome generation (min 1 additional map)
         :return: modified heightmap chunk values (numpy matrix of size [chunk_width x chunk_width]).
         """
         # self._generate_random_sequence(chunk_x, chunk_y)
@@ -80,7 +82,12 @@ class MapModifier:
                 total_weight = 0.0
                 for b in biome_chunk.get_tile(x, y):
                     total_weight += b[0]
-                    average_value += b[0] * b[1].height_modification(h, b[1].biome_parameters)
+                    if value_maps_info is None:
+                        average_value += b[0] * b[1].height_modification(h, b[1].biome_parameters)
+                    else:
+                        average_value += b[0] * b[1].height_modification(h,
+                                                                         b[1].biome_parameters,
+                                                                         [c.get_tile(x, y) for c in value_maps_info])
                 if total_weight != 0:
                     self.value_matrix[x, y] = average_value / total_weight
 
