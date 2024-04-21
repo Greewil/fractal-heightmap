@@ -32,6 +32,7 @@ class BiomeGenerator:
                                 and biome area will be determined with voronoi algorithm.
         biome_blend_radios      Width of biome blending line in which biomes will be mixed together.
         get_biome_type          Method which contains logic about biome type placement on map.
+                                First parameter is biome_node_x, second - biome_node_y, third - biome map seed.
     """
 
     def __init__(self, seed: Optional[int] = None, chunk_width: Optional[int] = TILES_IN_CHUNK,
@@ -49,6 +50,7 @@ class BiomeGenerator:
                                     and biome area will be determined with voronoi algorithm.
         :param biome_blend_radios:  Width of biome blending line in which biomes will be mixed together.
         :param get_biome_type:      Method which contains logic about biome type placement on map.
+                                    First parameter is biome_node_x, second - biome_node_y, third - biome map seed.
         """
         if seed is None:
             self.seed = get_random_seed()
