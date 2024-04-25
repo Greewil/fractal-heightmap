@@ -1,4 +1,4 @@
-from typing import AnyStr, Optional, Union
+from typing import AnyStr, Optional, Union, Callable
 
 from world_map_generator.default_values import TILES_IN_CHUNK
 from world_map_generator.utils import Bounding
@@ -117,6 +117,11 @@ class Map:
         bounding.top = (bounding.top + 1) * self.chunk_width
         bounding.bottom *= self.chunk_width
         return bounding
+
+    def for_each_chunk(self, func: Callable[[Chunk], None]):
+        """ Runs functions for each chunk in map. """
+        for chunk in self.chunks.itervalues():
+            func(chunk)
 
     def __str__(self) -> AnyStr:
         return '{"seed": ' + str(self.seed) + \
