@@ -1,5 +1,6 @@
 import time
 
+from world_map_generator.default_values import DIAMOND_SQUARE_BASE_GRID_MAX_VALUE
 from world_map_generator.generation import FractalGenerator
 from world_map_generator.map import Map
 from world_map_generator.rendering import save_height_map_as_image
@@ -21,4 +22,4 @@ if __name__ == '__main__':
     #         height_map.set_chunk(generator.generate_chunk(i, j))
     print(time.process_time() - start, 'seconds')
     print(height_map.number_of_generated_chunks(), height_map.number_of_generated_tiles())
-    save_height_map_as_image(height_map, 'tst', max_color_value=150)
+    save_height_map_as_image(height_map, 'tst', max_color_value=1.5 * DIAMOND_SQUARE_BASE_GRID_MAX_VALUE)

@@ -6,7 +6,6 @@ from world_map_generator.generation import BiomeGenerator, FractalGenerator
 from world_map_generator.generation.map_modifier import MapModifier
 from world_map_generator.map import Map
 from world_map_generator.map.biome import BiomeType
-from world_map_generator.map.chunk import ValueChunk
 from world_map_generator.rendering import save_biome_map_as_image, save_height_map_as_image
 from world_map_generator.utils import (get_position_seed, weighted_random_selection, get_cumulative_distribution_list,
                                        Bounding)
@@ -98,15 +97,11 @@ if __name__ == '__main__':
     print(time.process_time() - start, 'seconds', '(biome map)')
     save_biome_map_as_image(biome_map, 'biomes_map')
 
-    def modify_heightmap_chunk(x: int, y: int):
-        modified_chunk_values = modifier.modify_heightmap_chunk(x, y,
-                                                                height_map.get_chunk(x, y),
-                                                                biome_map.get_chunk(x, y))
-        height_map.set_chunk(ValueChunk(x, y, tiles=modified_chunk_values))
-
     modifier = MapModifier(biome_map.seed, chunk_width)
     start = time.process_time()
-    bounding.for_each(modify_heightmap_chunk)
+    bounding.for_each(lambda x, y: height_map.set_chunk(modifier.modify_heightmap_chunk(x, y,
+                                                                                        height_map.get_chunk(x, y),
+                                                                                        biome_map.get_chunk(x, y))))
     print(time.process_time() - start, 'seconds', '(modified heightmap)')
     print(f'seed = {height_map.seed}')
     print(height_map.number_of_generated_chunks(), height_map.number_of_generated_tiles())
