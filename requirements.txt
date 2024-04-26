@@ -1,7 +1,7 @@
 flake8==7.0.0
 mccabe==0.7.0
 numpy==1.26.4
-Pillow==9.5.0
+pillow==10.3.0
 pycodestyle==2.11.1
 pyflakes==3.2.0
 scipy==1.12.0
