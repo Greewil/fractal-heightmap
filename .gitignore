@@ -163,5 +163,6 @@ cython_debug/
 .idea/
 
 *usage_examples/*.png
+*usage_examples/*.json
 *.blend
 *.blend1
