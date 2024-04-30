@@ -12,7 +12,8 @@ from world_map_generator.utils import (get_position_seed, weighted_random_select
                                        Bounding)
 
 
-def remove_modifier(height: float, biome_parameters: dict, value_maps_values: List[float] = None) -> float:
+def remove_modifier(height: float, x: float, y: float, biome_parameters: dict,
+                    value_maps_values: List[float] = None) -> float:
     threshold = 0.35 * DIAMOND_SQUARE_BASE_GRID_MAX_VALUE
     if height < threshold:
         return height
@@ -25,7 +26,8 @@ def remove_modifier(height: float, biome_parameters: dict, value_maps_values: Li
         return 1.5 * height + 30 - 100 * drop
 
 
-def add_modifier(height: float, biome_parameters: dict, value_maps_values: List[float] = None) -> float:
+def add_modifier(height: float, x: float, y: float, biome_parameters: dict,
+                 value_maps_values: List[float] = None) -> float:
     threshold = 0.75 * DIAMOND_SQUARE_BASE_GRID_MAX_VALUE
     if height < threshold:
         return height
@@ -36,7 +38,8 @@ def add_modifier(height: float, biome_parameters: dict, value_maps_values: List[
         return threshold + (height - threshold) * 1.5 + 50 * drop
 
 
-def cliff_modifier(height: float, biome_parameters: dict, value_maps_values: List[float] = None) -> float:
+def cliff_modifier(height: float, x: float, y: float, biome_parameters: dict,
+                   value_maps_values: List[float] = None) -> float:
     threshold = 0.68 * DIAMOND_SQUARE_BASE_GRID_MAX_VALUE
     scaled_shift_map = DIAMOND_SQUARE_BASE_GRID_MAX_VALUE * value_maps_values[0]
     if scaled_shift_map < threshold:
@@ -92,7 +95,7 @@ if __name__ == '__main__':
     wider_bounding.for_each(lambda x, y: shift_map.set_chunk(shift_generator.generate_chunk(x, y)))
     print(time.process_time() - start, 'seconds', '(shift_map)')
     save_height_map_as_image(shift_map, 'shift_map',
-                             max_color_value=2 * DIAMOND_SQUARE_BASE_GRID_MAX_VALUE)
+                             max_color_value=1)
 
     biome_map = Map(height_map.seed)
     biome_generator = BiomeGenerator(biome_map.seed,

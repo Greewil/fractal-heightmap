@@ -11,7 +11,8 @@ from world_map_generator.utils import (get_position_seed, weighted_random_select
                                        Bounding)
 
 
-def cliff_modifier(height: float, biome_parameters: dict, value_maps_values: List[float] = None) -> float:
+def cliff_modifier(height: float, x: float, y: float, biome_parameters: dict,
+                   value_maps_values: List[float] = None) -> float:
     if height < 50:
         return height
     else:
@@ -19,7 +20,8 @@ def cliff_modifier(height: float, biome_parameters: dict, value_maps_values: Lis
         return (height + drop) * 100 / (drop + 100)
 
 
-def multiply_modifier(height: float, biome_parameters: dict, value_maps_values: List[float] = None) -> float:
+def multiply_modifier(height: float, x: float, y: float, biome_parameters: dict,
+                      value_maps_values: List[float] = None) -> float:
     threshold = 50
     if height < threshold:
         return height
@@ -27,7 +29,8 @@ def multiply_modifier(height: float, biome_parameters: dict, value_maps_values: 
         return threshold + (height - threshold) * 1.5
 
 
-def volcano_modifier(height: float, biome_parameters: dict, value_maps_values: List[float] = None) -> float:
+def volcano_modifier(height: float, x: float, y: float, biome_parameters: dict,
+                     value_maps_values: List[float] = None) -> float:
     height = multiply_modifier(height, biome_parameters)
     threshold = 105
     if height < threshold:

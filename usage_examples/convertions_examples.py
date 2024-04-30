@@ -1,12 +1,9 @@
 import time
 
-from world_map_generator.default_values import DIAMOND_SQUARE_BASE_GRID_MAX_VALUE
 from world_map_generator.generation import FractalGenerator
 from world_map_generator.map import Map
-from world_map_generator.rendering import save_height_map_as_image
 from world_map_generator.utils import Bounding
-from world_map_generator.utils.convertors import json_to_value_chunk, value_chunk_array_to_json, value_chunk_to_json, \
-    map_region_to_json
+from world_map_generator.utils.convertors import json_to_value_chunk, value_chunk_to_json, map_region_to_json
 
 if __name__ == '__main__':
     chunk_width = 64

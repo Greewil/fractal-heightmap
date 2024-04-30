@@ -1,5 +1,5 @@
 # Version
-GENERATOR_VERSION = '0.2.1'
+GENERATOR_VERSION = '0.3.0'
 
 # General generators parameters
 TILES_IN_CHUNK = 64

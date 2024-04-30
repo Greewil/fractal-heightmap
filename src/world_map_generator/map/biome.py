@@ -3,10 +3,12 @@ from typing import Optional, Callable, Tuple, List
 from world_map_generator.utils import random_color
 
 
-def base_height_modification(h: float,
+def base_height_modification(height: float,
+                             x: int,
+                             y: int,
                              biome_parameters: Optional[dict] = None,
                              value_maps_values: Optional[List[float]] = None) -> float:
-    return h
+    return height
 
 
 class BiomeType:
@@ -15,9 +17,12 @@ class BiomeType:
     Attributes:
         title                   The title of the biome type.
         height_modification     Method which will be used to modify heightmap values at this biome type.
-                                Where first input parameter is height to modify, second - biome_parameters,
-                                third - list of additional value_map values for current tile which will be
-                                modified.
+                                Where input parameters are:
+                                    height - height to modify (float),
+                                    x - tile x (int),
+                                    x - tile x (int),
+                                    biome_parameters - dict of biome parameters (dict),
+                                    value_maps_values - list of additional value_map values for current tile (list).
         biome_parameters        Dict of some additional parameters (f.e. appearance_weight).
         rendering_color         RGB color which will be used in rendering.
                                 If rendering_color is None, the color will be selected randomly.
@@ -31,9 +36,13 @@ class BiomeType:
         """ Type of biome instance.
         :param title:                   The title of the biome type.
         :param height_modification:     Method which will be used to modify heightmap values at this biome type.
-                                        Where first input parameter is height to modify, second - biome_parameters,
-                                        third - list of additional value_map values for current tile which will be
-                                        modified.
+                                        Where input parameters are:
+                                            height - height to modify (float),
+                                            x - tile x (int),
+                                            x - tile x (int),
+                                            biome_parameters - dict of biome parameters (dict),
+                                            value_maps_values - list of additional value_map values for current tile
+                                                                (list).
         :param biome_parameters:        Dict of some additional parameters (f.e. appearance_weight).
         :param rendering_color:         RGB color which will be used in rendering.
                                         If rendering_color is None, the color will be selected randomly.

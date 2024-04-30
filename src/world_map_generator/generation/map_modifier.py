@@ -83,11 +83,17 @@ class MapModifier:
                 for b in biome_chunk.get_tile(x, y):
                     total_weight += b[0]
                     if value_maps_info is None:
-                        average_value += b[0] * b[1].height_modification(h, b[1].biome_parameters)
+                        average_value += b[0] * b[1].height_modification(height=h,
+                                                                         x=x + self.chunk_width * chunk_x,
+                                                                         y=y + self.chunk_width * chunk_y,
+                                                                         biome_parameters=b[1].biome_parameters)
                     else:
-                        average_value += b[0] * b[1].height_modification(h,
-                                                                         b[1].biome_parameters,
-                                                                         [c.get_tile(x, y) for c in value_maps_info])
+                        value_maps_values = [c.get_tile(x, y) for c in value_maps_info]
+                        average_value += b[0] * b[1].height_modification(height=h,
+                                                                         x=x + self.chunk_width * chunk_x,
+                                                                         y=y + self.chunk_width * chunk_y,
+                                                                         biome_parameters=b[1].biome_parameters,
+                                                                         value_maps_values=value_maps_values)
                 if total_weight != 0:
                     self.value_matrix[x, y] = average_value / total_weight
 
