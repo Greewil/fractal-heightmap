@@ -20,7 +20,7 @@ class BiomeType:
                                 Where input parameters are:
                                     height - height to modify (float),
                                     x - tile x (int),
-                                    x - tile x (int),
+                                    y - tile y (int),
                                     biome_parameters - dict of biome parameters (dict),
                                     value_maps_values - list of additional value_map values for current tile (list).
         biome_parameters        Dict of some additional parameters (f.e. appearance_weight).
@@ -39,7 +39,7 @@ class BiomeType:
                                         Where input parameters are:
                                             height - height to modify (float),
                                             x - tile x (int),
-                                            x - tile x (int),
+                                            y - tile y (int),
                                             biome_parameters - dict of biome parameters (dict),
                                             value_maps_values - list of additional value_map values for current tile
                                                                 (list).

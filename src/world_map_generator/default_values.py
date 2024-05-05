@@ -17,3 +17,14 @@ BIOME_GRID_STEP = 128
 #                       After smoothing  each point near biome borders will have average nearby biomes
 #                       values with weights.
 BIOME_BLEND_RADIOS = 15
+
+# Round structures generation
+# ROUND_STRUCTURE_GRID_STEP:        Distance between round structure grid cells.
+#                                   Near each node will be created round structure with central
+#                                   position +- half of grid step.
+ROUND_STRUCTURE_GRID_STEP = 64
+# ROUND_STRUCTURE_BASE_MAX_RADIUS:  Maximum distance from round structure center
+#                                   which can be handled due generation.
+ROUND_STRUCTURE_BASE_MAX_RADIUS = 100
+# ROUND_STRUCTURE_BASE_MAX_VALUE:  Maximum value that can be generated with current round structure.
+ROUND_STRUCTURE_BASE_MAX_VALUE = 1

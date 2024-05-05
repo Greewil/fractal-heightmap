@@ -34,6 +34,8 @@ def value_chunk_array_to_json(chunks: List[ValueChunk]) -> str:
     chunks_as_dict = [value_chunk_to_json(c) for c in chunks]
     return json.dumps(chunks_as_dict)
 
+# TODO json_to_value_chunk_array
+
 
 def map_region_to_json(value_map: Map, bounding: Bounding) -> str:
     tiles_x_size = value_map.chunk_width * (bounding.right - bounding.left)
@@ -62,6 +64,11 @@ def map_region_to_json(value_map: Map, bounding: Bounding) -> str:
         "tiles": tiles,
     }
     return json.dumps(map_region)
+
+# TODO biome_chunk_to_json
+# TODO json_to_biome_chunk
+# TODO biome_chunk_array_to_json
+# TODO json_to_biome_chunk_array
 
 # def save_tile_rectangle_as_binary(self, bounding: Bounding):
 #     tiles_x_size = self.chunk_width * (bounding.right - bounding.left)
