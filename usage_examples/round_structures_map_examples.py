@@ -10,7 +10,8 @@ from world_map_generator.generation.primitives.round_structure import RoundStruc
     COS_COS_ROUND_STRUCTURE_TYPE, COS_HYPERBOLE_ROUND_STRUCTURE_TYPE, COS_ROUND_STRUCTURE_TYPE, \
     LINEAR_ROUND_STRUCTURE_TYPE, STEP_ROUND_STRUCTURE_TYPE
 from world_map_generator.generation.round_structures_generator import DotsGenerator, get_value_intersection_max, \
-    get_value_intersection_sum_clip
+    get_value_intersection_sum_clip, get_value_intersection_sum, get_d_xy_euclidean, get_d_xy_min, get_d_xy_f3, \
+    get_d_xy_f4, get_d_xy_f3_abs, get_d_xy_f05, get_d_xy_max, get_d_xy_euclidean_cos
 from world_map_generator.map import Map
 from world_map_generator.rendering import save_height_map_as_image
 from world_map_generator.utils import Bounding, get_position_seed
@@ -23,8 +24,20 @@ def cos_cos_cos_radius_function(r: float, max_r: float, dx: float, dy: float, ma
     return np.cos(3 * cur_rotation) * max_value * 0.5 * (1 + np.cos(np.pi * (1 - cos_r)))
 
 
-COS_COS_COS_ROUND_STRUCTURE_TYPE = RoundStructureType('Cos(cos)*cos(a) round structure',
-                                                      radius_function=cos_cos_cos_radius_function)
+def atoll_radius_function(r: float, max_r: float, dx: float, dy: float, max_value: float,
+                          parameters: Optional[dict] = None) -> float:
+    relative_r = r / max_r
+    # TODO add atoll line width, close clip, far clip
+    if relative_r < 0.75:
+        return 0
+    else:
+        cur_rotation = np.arctan2(dx, dy) + parameters.get('rotation', 0)
+        r_modifier = max_value * 0.5 * (1 + np.cos(5 * (relative_r - 0.8) * np.pi))
+        rotation_modifier = np.cos(cur_rotation)
+        return max(0, rotation_modifier * r_modifier)
+
+
+ATOLL_STRUCTURE_TYPE = RoundStructureType('Atoll', radius_function=atoll_radius_function)
 
 
 if __name__ == '__main__':
@@ -52,7 +65,7 @@ if __name__ == '__main__':
 
         # round_structure_cos_cos = deepcopy(COS_ROUND_STRUCTURE_TYPE)
         # round_structure_cos_cos = deepcopy(COS_COS_ROUND_STRUCTURE_TYPE)
-        round_structure_cos_cos = deepcopy(COS_COS_COS_ROUND_STRUCTURE_TYPE)
+        round_structure_cos_cos = deepcopy(ATOLL_STRUCTURE_TYPE)
         # round_structure_cos_cos = deepcopy(STEP_ROUND_STRUCTURE_TYPE)
         round_structure_cos_cos.parameters['rotation'] = rnd[3] * 2 * np.pi
         round_structure_cos_cos.max_r = 25 + 85 * rnd[1]
@@ -71,7 +84,7 @@ if __name__ == '__main__':
 
     round_structures_map = Map(height_map.seed, chunk_width=chunk_width)
     generator = DotsGenerator(round_structures_map.seed, chunk_width, 100,
-                              get_round_structure_type, get_value_intersection_sum_clip)
+                              get_round_structure_type, get_value_intersection_sum_clip(), get_d_xy_euclidean_cos(8))
     start = time.process_time()
     bounding = Bounding(0, 0, 8, 8)
     bounding.for_each(lambda x, y: round_structures_map.set_chunk(generator.generate_chunk(x, y)))

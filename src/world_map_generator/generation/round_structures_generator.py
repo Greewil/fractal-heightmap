@@ -1,3 +1,4 @@
+from math import sqrt, cos, atan2
 from typing import Optional, Callable, List, Tuple
 
 import numpy as np
@@ -10,6 +11,12 @@ from world_map_generator.utils import Bounding, get_position_seed
 from ..map.chunk import ValueChunk
 
 
+def get_base_round_structure_type(seed: int,
+                                  round_structure_node_x: int, round_structure_node_y: int,
+                                  tile_x: int, tile_y: int) -> RoundStructureType | None:
+    return STEP_ROUND_STRUCTURE_TYPE
+
+
 def get_value_intersection_max(v1: float, v2: float) -> float:
     return max(v1, v2)
 
@@ -18,16 +25,63 @@ def get_value_intersection_sum(v1: float, v2: float) -> float:
     return v1 + v2
 
 
-def get_value_intersection_sum_clip(v1: float, v2: float, clip: Optional[float] = 1) -> float:
+def get_value_intersection_sum_clip(clip: Optional[float] = 1) -> float:
     def sum_clip(s1: float, s2: float) -> float:
         return min(clip, s1 + s2)
-    return sum_clip(v1, v2)
+
+    return sum_clip
 
 
-def get_base_round_structure_type(seed: int,
-                                  round_structure_node_x: int, round_structure_node_y: int,
-                                  tile_x: int, tile_y: int) -> RoundStructureType | None:
-    return STEP_ROUND_STRUCTURE_TYPE
+def get_d_xy_euclidean(dx: float, dy: float) -> float:
+    r_square = dx * dx + dy * dy
+    dxy = sqrt(r_square)
+    return dxy
+
+
+def get_d_xy_f3(dx: float, dy: float) -> float:
+    r_3 = abs(dx * dx * dx) + abs(dy * dy * dy)
+    # print(r_3)
+    dxy = pow(r_3, 1.0 / 3)
+    return dxy
+
+
+def get_d_xy_f3_abs(dx: float, dy: float) -> float:
+    r_3 = dx * dx * dx + dy * dy * dy
+    dxy = pow(abs(r_3), 1.0 / 3)
+    return dxy
+
+
+def get_d_xy_f4(dx: float, dy: float) -> float:
+    r_4 = pow(dx, 4) + pow(dy, 4)
+    dxy = pow(r_4, 0.25)
+    return dxy
+
+
+def get_d_xy_f05(dx: float, dy: float) -> float:
+    r_4 = sqrt(abs(dx)) + sqrt(abs(dy))
+    dxy = r_4 * r_4
+    return dxy
+
+
+def get_d_xy_euclidean_cos(cos_periods: Optional[float] = 1) -> float:
+    def get_d_xy_euclidean_cos_with_period(dx: float, dy: float) -> float:
+        rotation = atan2(dx, dy)
+        r_square = dx * dx + dy * dy - dx * dy * cos(cos_periods * rotation)
+        dxy = sqrt(r_square)
+        return dxy
+    return get_d_xy_euclidean_cos_with_period
+
+
+def get_d_xy_max(dx: float, dy: float) -> float:
+    return max(abs(dx), abs(dy))
+
+
+def get_d_xy_min(dx: float, dy: float) -> float:
+    return min(abs(dx), abs(dy))
+
+
+def get_d_xy_sum(dx: float, dy: float) -> float:
+    return abs(dx) + abs(dy)
 
 
 class DotsGenerator(ChunkGenerator):
@@ -55,13 +109,21 @@ class DotsGenerator(ChunkGenerator):
                                     Where input parameters are:
                                         v1 - value from firsts round structure (float),
                                         v2 - value from second round structure (float).
+        get_d_xy                    Method returns distance between two points (x1, y1) and (x2, y2).
+                                    So this method describes space metric for this generator.
+                                    Note that optimizer will clip all structures which don't feat bounding square
+                                    (Euclidian square with sides: 2 * round_structure_type.max_r).
+                                    Where input parameters are:
+                                        dx - x distance which equals: x1 - x2 (float),
+                                        dy - y distance which equals: y1 - y2 (float).
     """
 
     def __init__(self, seed: Optional[int] = None, chunk_width: Optional[int] = TILES_IN_CHUNK,
                  round_structure_grid_step: Optional[int] = ROUND_STRUCTURE_GRID_STEP,
                  get_round_structure_type: Callable[[int, int, int, int, int],
                                                     RoundStructureType] = get_base_round_structure_type,
-                 get_value_intersection: Optional[Callable[[float, float], float]] = get_value_intersection_sum_clip):
+                 get_value_intersection: Optional[Callable[[float, float], float]] = get_value_intersection_sum_clip(),
+                 get_d_xy: Optional[Callable[[float, float], float]] = get_d_xy_sum):
         """ Generator of round structure map chunks.
         :param seed:                        Number which is used in procedural generation.
                                             If it wasn't specified it will be generated randomly.
@@ -84,11 +146,19 @@ class DotsGenerator(ChunkGenerator):
                                             Where input parameters are:
                                                 v1 - value from firsts round structure (float),
                                                 v2 - value from second round structure (float).
+        :param get_d_xy:                    Method returns distance between two points (x1, y1) and (x2, y2).
+                                            So this method describes space metric for this generator.
+                                            Note that optimizer will clip all structures which don't feat bounding
+                                            square (Euclidian square with sides: 2 * round_structure_type.max_r).
+                                            Where input parameters are:
+                                                dx - x distance which equals: x1 - x2 (float),
+                                                dy - y distance which equals: y1 - y2 (float).
         """
         super().__init__(seed, chunk_width)
         self._round_structure_grid_step = round_structure_grid_step
         self._get_round_structure_type = get_round_structure_type
         self._get_value_intersection = get_value_intersection
+        self._get_d_xy = get_d_xy
         self._clean_value_matrix()
 
     @property
@@ -98,6 +168,14 @@ class DotsGenerator(ChunkGenerator):
     @property
     def get_round_structure_type(self):
         return self._get_round_structure_type
+
+    @property
+    def get_value_intersection(self):
+        return self._get_value_intersection
+
+    @property
+    def get_d_xy(self):
+        return self._get_d_xy
 
     def _clean_value_matrix(self):
         """ Sets values of value_matrix (matrix of all values needed to generate one chunk) to zeros. """
@@ -142,7 +220,6 @@ class DotsGenerator(ChunkGenerator):
                 if is_no_structure:
                     continue
                 # There is no intersections if structure bounding (square) does not intersect chunk
-                # TODO better check, not just bounding
                 is_no_intersections_x = (rs_center[0] + rs_type.max_r < chunk_x * self.chunk_width
                                          or rs_center[0] - rs_type.max_r > (chunk_x + 1) * self.chunk_width)
                 is_no_intersections_y = (rs_center[1] + rs_type.max_r < chunk_y * self.chunk_width
@@ -159,20 +236,20 @@ class DotsGenerator(ChunkGenerator):
         output = 0
         for rs in round_structures:
             rs_type = rs.round_structure_type
-            dx = x - rs.x
-            dy = rs.y - y
-            r_square = dx * dx + dy * dy
             max_r = rs_type.max_r
             max_value = rs_type.max_value
-            if r_square < max_r * max_r:
+            dx = x - rs.x
+            dy = rs.y - y
+            dxy = self.get_d_xy(dx, dy)
+            if dxy < max_r:
                 radius_function = rs_type.radius_function
                 params = rs_type.parameters
-                cur_r = radius_function(r=np.sqrt(r_square), max_r=max_r, dx=dx, dy=dy, max_value=max_value,
+                cur_r = radius_function(r=dxy, max_r=max_r, dx=dx, dy=dy, max_value=max_value,
                                         parameters=params)
                 if output == 0:
                     output = cur_r
                 else:
-                    output = self._get_value_intersection(output, cur_r)
+                    output = self.get_value_intersection(output, cur_r)
         return output
 
     def _generate_chunk_for_round_structures(self, chunk_x: int, chunk_y: int,
