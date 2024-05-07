@@ -159,13 +159,16 @@ class DotsGenerator(ChunkGenerator):
         output = 0
         for rs in round_structures:
             rs_type = rs.round_structure_type
-            r_square = (rs.x - x) * (rs.x - x) + (rs.y - y) * (rs.y - y)
+            dx = x - rs.x
+            dy = rs.y - y
+            r_square = dx * dx + dy * dy
             max_r = rs_type.max_r
             max_value = rs_type.max_value
             if r_square < max_r * max_r:
                 radius_function = rs_type.radius_function
                 params = rs_type.parameters
-                cur_r = radius_function(r=np.sqrt(r_square), max_r=max_r, max_value=max_value, parameters=params)
+                cur_r = radius_function(r=np.sqrt(r_square), max_r=max_r, dx=dx, dy=dy, max_value=max_value,
+                                        parameters=params)
                 if output == 0:
                     output = cur_r
                 else:

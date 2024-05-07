@@ -5,24 +5,29 @@ from numpy import pi, cos
 from world_map_generator.default_values import ROUND_STRUCTURE_BASE_MAX_RADIUS, ROUND_STRUCTURE_BASE_MAX_VALUE
 
 
-def step_radius_function(r: float, max_r: float, max_value: float, parameters: Optional[dict] = None) -> float:
+def step_radius_function(r: float, max_r: float, dx: float, dy: float, max_value: float,
+                         parameters: Optional[dict] = None) -> float:
     return max_value
 
 
-def linear_radius_function(r: float, max_r: float, max_value: float, parameters: Optional[dict] = None) -> float:
+def linear_radius_function(r: float, max_r: float, dx: float, dy: float, max_value: float,
+                           parameters: Optional[dict] = None) -> float:
     return max_value * (1 - r / max_r)
 
 
-def cos_radius_function(r: float, max_r: float, max_value: float, parameters: Optional[dict] = None) -> float:
+def cos_radius_function(r: float, max_r: float, dx: float, dy: float, max_value: float,
+                        parameters: Optional[dict] = None) -> float:
     return max_value * 0.5 * (1 + cos(r * pi / max_r))
 
 
-def cos_cos_radius_function(r: float, max_r: float, max_value: float, parameters: Optional[dict] = None) -> float:
+def cos_cos_radius_function(r: float, max_r: float, dx: float, dy: float, max_value: float,
+                            parameters: Optional[dict] = None) -> float:
     cos_r = 0.5 * (1 + cos(r * pi / max_r))
     return max_value * 0.5 * (1 + cos(pi * (1 - cos_r)))
 
 
-def cos_hyperbole_radius_function(r: float, max_r: float, max_value: float, parameters: Optional[dict] = None) -> float:
+def cos_hyperbole_radius_function(r: float, max_r: float, dx: float, dy: float, max_value: float,
+                                  parameters: Optional[dict] = None) -> float:
     hyperbole_r = (1 - 1 / (1 + r / max_r))
     return max_value * 0.5 * (1 + cos(2 * pi * hyperbole_r))
 
@@ -40,6 +45,10 @@ class RoundStructureType:
                                         r - distance to round structure center (float),
                                         max_r - max distance from tile to round structure center
                                             which can be handled due generation (float),
+                                        dx - difference between tile x and round structure center's x (float),
+                                        dy - difference between tile y and round structure center's y (float),
+                                        max_value - max value that can be generated
+                                            with current round structure (float),
                                         parameters - round structure type parameters (dict).
         parameters                  Dict of some additional parameters (f.e. appearance_weight).
     """
@@ -59,7 +68,9 @@ class RoundStructureType:
                                         Where input parameters are:
                                             r - distance to round structure center (float),
                                             max_r - max distance from tile to round structure center
-                                                which can be handled due generation (float).
+                                                which can be handled due generation (float),
+                                            dx - difference between tile x and round structure center's x (float),
+                                            dy - difference between tile y and round structure center's y (float),
                                             max_value - max value that can be generated
                                                 with current round structure (float),
                                             parameters - round structure type parameters (dict).

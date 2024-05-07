@@ -1,5 +1,6 @@
 import time
 from copy import deepcopy
+from typing import Optional
 
 import numpy as np
 
@@ -8,10 +9,23 @@ from world_map_generator.generation import FractalGenerator
 from world_map_generator.generation.primitives.round_structure import RoundStructureType, \
     COS_COS_ROUND_STRUCTURE_TYPE, COS_HYPERBOLE_ROUND_STRUCTURE_TYPE, COS_ROUND_STRUCTURE_TYPE, \
     LINEAR_ROUND_STRUCTURE_TYPE, STEP_ROUND_STRUCTURE_TYPE
-from world_map_generator.generation.round_structures_generator import DotsGenerator
+from world_map_generator.generation.round_structures_generator import DotsGenerator, get_value_intersection_max, \
+    get_value_intersection_sum_clip
 from world_map_generator.map import Map
 from world_map_generator.rendering import save_height_map_as_image
 from world_map_generator.utils import Bounding, get_position_seed
+
+
+def cos_cos_cos_radius_function(r: float, max_r: float, dx: float, dy: float, max_value: float,
+                                parameters: Optional[dict] = None) -> float:
+    cur_rotation = np.arctan2(dx, dy) + parameters['rotation']
+    cos_r = 3 * 0.5 * (1 + np.cos(r * np.pi / max_r))
+    return np.cos(3 * cur_rotation) * max_value * 0.5 * (1 + np.cos(np.pi * (1 - cos_r)))
+
+
+COS_COS_COS_ROUND_STRUCTURE_TYPE = RoundStructureType('Cos(cos)*cos(a) round structure',
+                                                      radius_function=cos_cos_cos_radius_function)
+
 
 if __name__ == '__main__':
     chunk_width = 64
@@ -34,19 +48,19 @@ if __name__ == '__main__':
                                  tile_x: int, tile_y: int) -> RoundStructureType | None:
         pos_seed = get_position_seed(round_structure_node_x, round_structure_node_y, seed)
         np.random.seed(pos_seed)
-        rnd = np.random.rand(3)
+        rnd = np.random.rand(4)
 
         # round_structure_cos_cos = deepcopy(COS_ROUND_STRUCTURE_TYPE)
-        round_structure_cos_cos = deepcopy(COS_COS_ROUND_STRUCTURE_TYPE)
+        # round_structure_cos_cos = deepcopy(COS_COS_ROUND_STRUCTURE_TYPE)
+        round_structure_cos_cos = deepcopy(COS_COS_COS_ROUND_STRUCTURE_TYPE)
         # round_structure_cos_cos = deepcopy(STEP_ROUND_STRUCTURE_TYPE)
-        # round_structure_cos_cos.max_r = 25 + 50
+        round_structure_cos_cos.parameters['rotation'] = rnd[3] * 2 * np.pi
         round_structure_cos_cos.max_r = 25 + 85 * rnd[1]
         round_structure_cos_cos.max_value = 0.25 + 0.75 * rnd[2]
         # round_structure_cos_hyperbole = deepcopy(STEP_ROUND_STRUCTURE_TYPE)
         # round_structure_cos_hyperbole = deepcopy(LINEAR_ROUND_STRUCTURE_TYPE)
         # round_structure_cos_hyperbole = deepcopy(COS_ROUND_STRUCTURE_TYPE)
         round_structure_cos_hyperbole = deepcopy(COS_HYPERBOLE_ROUND_STRUCTURE_TYPE)
-        # round_structure_cos_hyperbole.max_r = 25 + 50
         round_structure_cos_hyperbole.max_r = 25 + 50 * rnd[1]
         if rnd[0] > 0.5 * tile_x * 0.0035:
             return round_structure_cos_cos
@@ -56,7 +70,8 @@ if __name__ == '__main__':
             return None
 
     round_structures_map = Map(height_map.seed, chunk_width=chunk_width)
-    generator = DotsGenerator(round_structures_map.seed, chunk_width, 100, get_round_structure_type)
+    generator = DotsGenerator(round_structures_map.seed, chunk_width, 100,
+                              get_round_structure_type, get_value_intersection_sum_clip)
     start = time.process_time()
     bounding = Bounding(0, 0, 8, 8)
     bounding.for_each(lambda x, y: round_structures_map.set_chunk(generator.generate_chunk(x, y)))
