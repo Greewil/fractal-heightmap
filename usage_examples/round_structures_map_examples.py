@@ -1,11 +1,12 @@
 import time
 from copy import deepcopy
-from typing import Optional
+from math import sin
+from typing import Optional, Tuple, List
 
 import numpy as np
 
 from world_map_generator.default_values import DIAMOND_SQUARE_BASE_GRID_MAX_VALUE
-from world_map_generator.generation import FractalGenerator
+from world_map_generator.generation import FractalGenerator, MapComposer
 from world_map_generator.generation.primitives.round_structure import RoundStructureType, \
     COS_COS_ROUND_STRUCTURE_TYPE, COS_HYPERBOLE_ROUND_STRUCTURE_TYPE, COS_ROUND_STRUCTURE_TYPE, \
     LINEAR_ROUND_STRUCTURE_TYPE, STEP_ROUND_STRUCTURE_TYPE
@@ -13,23 +14,24 @@ from world_map_generator.generation.round_structures_generator import DotsGenera
     get_value_intersection_sum_clip, get_value_intersection_sum, get_d_xy_euclidean, get_d_xy_min, get_d_xy_f3, \
     get_d_xy_f4, get_d_xy_f3_abs, get_d_xy_f05, get_d_xy_max, get_d_xy_euclidean_cos
 from world_map_generator.map import Map
+from world_map_generator.map.biome import BiomeType
 from world_map_generator.rendering import save_height_map_as_image
 from world_map_generator.utils import Bounding, get_position_seed
 
 
 def cos_cos_cos_radius_function(r: float, max_r: float, dx: float, dy: float, max_value: float,
-                                parameters: Optional[dict] = None) -> float:
+                                parameters: Optional[dict], filling_value: float) -> float:
     cur_rotation = np.arctan2(dx, dy) + parameters['rotation']
     cos_r = 3 * 0.5 * (1 + np.cos(r * np.pi / max_r))
     return np.cos(3 * cur_rotation) * max_value * 0.5 * (1 + np.cos(np.pi * (1 - cos_r)))
 
 
 def atoll_radius_function(r: float, max_r: float, dx: float, dy: float, max_value: float,
-                          parameters: Optional[dict] = None) -> float:
+                          parameters: Optional[dict], filling_value: float) -> float:
     relative_r = r / max_r
     # TODO add atoll line width, close clip, far clip
     if relative_r < 0.75:
-        return 0
+        return filling_value
     else:
         cur_rotation = np.arctan2(dx, dy) + parameters.get('rotation', 0)
         r_modifier = max_value * 0.5 * (1 + np.cos(5 * (relative_r - 0.8) * np.pi))
@@ -48,13 +50,13 @@ if __name__ == '__main__':
     seed = 2258822325
     # seed = None
 
+    start = time.process_time()
     height_map = Map(seed=seed, chunk_width=chunk_width)
-    print(f'seed = {height_map.seed}')
-    # generator = FractalGenerator(height_map.seed, chunk_width, base_grid_distance)
-    # start = time.process_time()
-    # bounding = Bounding(0, 0, 8, 8)
-    # bounding.for_each(lambda x, y: height_map.set_chunk(generator.generate_chunk(x, y)))
-    # print(time.process_time() - start, 'seconds')
+    print(f'seed = {seed}')
+    generator = FractalGenerator(height_map.seed, chunk_width, base_grid_distance, 1)
+    bounding = Bounding(0, 0, 8, 8)
+    bounding.for_each(lambda x, y: height_map.set_chunk(generator.generate_chunk(x, y)))
+    print(time.process_time() - start, 'seconds')
 
     def get_round_structure_type(seed: int,
                                  round_structure_node_x: int, round_structure_node_y: int,
@@ -82,12 +84,24 @@ if __name__ == '__main__':
         else:
             return None
 
-    round_structures_map = Map(height_map.seed, chunk_width=chunk_width)
-    generator = DotsGenerator(round_structures_map.seed, chunk_width, 100,
-                              get_round_structure_type, get_value_intersection_sum_clip(), get_d_xy_euclidean_cos(8))
     start = time.process_time()
+    round_structures_map = Map(height_map.seed, chunk_width=chunk_width)
+    generator = DotsGenerator(round_structures_map.seed, chunk_width, 100, 0.0,
+                              get_round_structure_type, get_value_intersection_sum_clip(), get_d_xy_euclidean_cos(8))
     bounding = Bounding(0, 0, 8, 8)
     bounding.for_each(lambda x, y: round_structures_map.set_chunk(generator.generate_chunk(x, y)))
     print(time.process_time() - start, 'seconds')
+    save_height_map_as_image(round_structures_map, 'round_structures1', max_color_value=2)
+
+    def composing_func(seed: int, tile_x: int, tile_y: int, tiles: List[float | Tuple[float, BiomeType]]) -> float:
+        return tiles[0] * (0.5 + tiles[1])
+        # return tiles[0] + tiles[1] * sin(0.01 * tile_x)
+
+    start = time.process_time()
+    composed_map = Map(height_map.seed, chunk_width=chunk_width)
+    map_composer = MapComposer(height_map.seed + 1, chunk_width, composing_func)
+    bounding.for_each(lambda x, y: composed_map.set_chunk(
+        map_composer.compose_chunks(x, y, [height_map.get_chunk(x, y), round_structures_map.get_chunk(x, y)])))
+    print(time.process_time() - start, 'seconds')
     print(round_structures_map.number_of_generated_chunks(), round_structures_map.number_of_generated_tiles())
-    save_height_map_as_image(round_structures_map, 'round_structures1', max_color_value=1)
+    save_height_map_as_image(composed_map, 'round_structures1_composed', max_color_value=1)

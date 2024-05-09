@@ -120,10 +120,11 @@ class DotsGenerator(ChunkGenerator):
 
     def __init__(self, seed: Optional[int] = None, chunk_width: Optional[int] = TILES_IN_CHUNK,
                  round_structure_grid_step: Optional[int] = ROUND_STRUCTURE_GRID_STEP,
+                 filling_value: Optional[float] = 0.0,
                  get_round_structure_type: Callable[[int, int, int, int, int],
                                                     RoundStructureType] = get_base_round_structure_type,
                  get_value_intersection: Optional[Callable[[float, float], float]] = get_value_intersection_sum_clip(),
-                 get_d_xy: Optional[Callable[[float, float], float]] = get_d_xy_sum):
+                 get_d_xy: Optional[Callable[[float, float], float]] = get_d_xy_euclidean):
         """ Generator of round structure map chunks.
         :param seed:                        Number which is used in procedural generation.
                                             If it wasn't specified it will be generated randomly.
@@ -133,6 +134,7 @@ class DotsGenerator(ChunkGenerator):
         :param round_structure_grid_step:   Step between two closest base grid region centers.
                                             Near one region center will be created round structure
                                             selected by get_round_structure_type method.
+        :param filling_value:               Value that will be used in empty tiles.
         :param get_round_structure_type:    Method which contains logic about round structure type placement on map.
                                             Method returns RoundStructureType or None.
                                             Where input parameters are:
@@ -155,6 +157,7 @@ class DotsGenerator(ChunkGenerator):
                                                 dy - y distance which equals: y1 - y2 (float).
         """
         super().__init__(seed, chunk_width)
+        self.filling_value = filling_value
         self._round_structure_grid_step = round_structure_grid_step
         self._get_round_structure_type = get_round_structure_type
         self._get_value_intersection = get_value_intersection
@@ -179,7 +182,7 @@ class DotsGenerator(ChunkGenerator):
 
     def _clean_value_matrix(self):
         """ Sets values of value_matrix (matrix of all values needed to generate one chunk) to zeros. """
-        self.value_matrix = np.full((self.chunk_width, self.chunk_width), 0.0)
+        self.value_matrix = np.full((self.chunk_width, self.chunk_width), self.filling_value)
 
     def get_closest_round_structures_bounding(self, chunk_x: int, chunk_y: int) -> Bounding:
         """
@@ -197,6 +200,7 @@ class DotsGenerator(ChunkGenerator):
     def get_round_structure_center(self, round_structure_node_x: int, round_structure_node_y: int) \
             -> Tuple[float, float]:
         """ Returns position of round structure center. """
+        # TODO add control parameter for random amplitude
         pos_seed = get_position_seed(round_structure_node_x, round_structure_node_y, self.seed)
         np.random.seed(pos_seed)
         rnd = np.random.rand(2)
@@ -233,7 +237,8 @@ class DotsGenerator(ChunkGenerator):
         return round_structures
 
     def _get_tile_value(self, x: int, y: int, round_structures: List[RoundStructureInstance]) -> float:
-        output = 0
+        """ TODO """
+        output = self.filling_value
         for rs in round_structures:
             rs_type = rs.round_structure_type
             max_r = rs_type.max_r
@@ -245,8 +250,8 @@ class DotsGenerator(ChunkGenerator):
                 radius_function = rs_type.radius_function
                 params = rs_type.parameters
                 cur_r = radius_function(r=dxy, max_r=max_r, dx=dx, dy=dy, max_value=max_value,
-                                        parameters=params)
-                if output == 0:
+                                        parameters=params, filling_value=self.filling_value)
+                if output == self.filling_value:
                     output = cur_r
                 else:
                     output = self.get_value_intersection(output, cur_r)

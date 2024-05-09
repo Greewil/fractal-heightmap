@@ -6,28 +6,28 @@ from world_map_generator.default_values import ROUND_STRUCTURE_BASE_MAX_RADIUS, 
 
 
 def step_radius_function(r: float, max_r: float, dx: float, dy: float, max_value: float,
-                         parameters: Optional[dict] = None) -> float:
+                         parameters: Optional[dict], filling_value: float) -> float:
     return max_value
 
 
 def linear_radius_function(r: float, max_r: float, dx: float, dy: float, max_value: float,
-                           parameters: Optional[dict] = None) -> float:
+                           parameters: Optional[dict], filling_value: float) -> float:
     return max_value * (1 - r / max_r)
 
 
 def cos_radius_function(r: float, max_r: float, dx: float, dy: float, max_value: float,
-                        parameters: Optional[dict] = None) -> float:
+                        parameters: Optional[dict], filling_value: float) -> float:
     return max_value * 0.5 * (1 + cos(r * pi / max_r))
 
 
 def cos_cos_radius_function(r: float, max_r: float, dx: float, dy: float, max_value: float,
-                            parameters: Optional[dict] = None) -> float:
+                            parameters: Optional[dict], filling_value: float) -> float:
     cos_r = 0.5 * (1 + cos(r * pi / max_r))
     return max_value * 0.5 * (1 + cos(pi * (1 - cos_r)))
 
 
 def cos_hyperbole_radius_function(r: float, max_r: float, dx: float, dy: float, max_value: float,
-                                  parameters: Optional[dict] = None) -> float:
+                                  parameters: Optional[dict], filling_value: float) -> float:
     hyperbole_r = (1 - 1 / (1 + r / max_r))
     return max_value * 0.5 * (1 + cos(2 * pi * hyperbole_r))
 
