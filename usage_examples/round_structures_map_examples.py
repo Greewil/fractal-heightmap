@@ -11,8 +11,8 @@ from world_map_generator.generation.primitives.round_structure import RoundStruc
     COS_COS_ROUND_STRUCTURE_TYPE, COS_HYPERBOLE_ROUND_STRUCTURE_TYPE, COS_ROUND_STRUCTURE_TYPE, \
     LINEAR_ROUND_STRUCTURE_TYPE, STEP_ROUND_STRUCTURE_TYPE
 from world_map_generator.generation.round_structures_generator import DotsGenerator, get_value_intersection_max, \
-    get_value_intersection_sum_clip, get_value_intersection_sum, get_d_xy_euclidean, get_d_xy_min, get_d_xy_f3, \
-    get_d_xy_f4, get_d_xy_f3_abs, get_d_xy_f05, get_d_xy_max, get_d_xy_euclidean_cos
+    get_value_intersection_sum_clip, get_value_intersection_sum, get_d_xy_euclidean, get_d_xy_min, get_d_xy_l3, \
+    get_d_xy_l4, get_d_xy_l3_abs, get_d_xy_l05, get_d_xy_max, get_d_xy_euclidean_cos
 from world_map_generator.map import Map
 from world_map_generator.map.biome import BiomeType
 from world_map_generator.rendering import save_height_map_as_image
@@ -115,8 +115,8 @@ if __name__ == '__main__':
     # bounding = Bounding(0, 0, 8, 8)
     bounding.for_each(lambda x, y: round_structures_map_distorted.set_chunk(
         distortion_generator.distort_map_chunk(x, y, round_structures_map,
-                                            distortion_x_map.get_chunk(x, y),
-                                            distortion_y_map.get_chunk(x, y))))
+                                               distortion_x_map.get_chunk(x, y),
+                                               distortion_y_map.get_chunk(x, y))))
     print(time.process_time() - start, 'seconds')
     save_height_map_as_image(round_structures_map_distorted, 'round_structures1_distorted', bounding, max_color_value=2)
 
@@ -125,10 +125,11 @@ if __name__ == '__main__':
     round_structures_map_distorted_x2 = Map(height_map.seed + 2, chunk_width=chunk_width)
     bounding.for_each(lambda x, y: round_structures_map_distorted_x2.set_chunk(
         distortion_generator.distort_map_chunk(x, y, round_structures_map_distorted,
-                                            distortion_y_map.get_chunk(x, y),
-                                            distortion_x_map.get_chunk(x, y))))
+                                               distortion_y_map.get_chunk(x, y),
+                                               distortion_x_map.get_chunk(x, y))))
     print(time.process_time() - start, 'seconds')
-    save_height_map_as_image(round_structures_map_distorted_x2, 'round_structures1_distorted_x2', bounding, max_color_value=2)
+    save_height_map_as_image(round_structures_map_distorted_x2, 'round_structures1_distorted_x2', bounding,
+                             max_color_value=2)
 
     def composing_func(seed: int, tile_x: int, tile_y: int, tiles: List[float | Tuple[float, BiomeType]]) -> float:
         # return tiles[0] * (0.5 + tiles[1])
@@ -139,7 +140,8 @@ if __name__ == '__main__':
     composed_map = Map(height_map.seed + 3, chunk_width=chunk_width)
     map_composer = MapComposer(height_map.seed, chunk_width, composing_func)
     bounding.for_each(lambda x, y: composed_map.set_chunk(
-        map_composer.compose_chunks(x, y, [height_map.get_chunk(x, y), round_structures_map_distorted_x2.get_chunk(x, y)])))
+        map_composer.compose_chunks(x, y, [height_map.get_chunk(x, y),
+                                           round_structures_map_distorted_x2.get_chunk(x, y)])))
     print(time.process_time() - start, 'seconds')
     print(round_structures_map.number_of_generated_chunks(), round_structures_map.number_of_generated_tiles())
     save_height_map_as_image(composed_map, 'round_structures1_composed', max_color_value=1.5)

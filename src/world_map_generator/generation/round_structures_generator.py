@@ -38,26 +38,26 @@ def get_d_xy_euclidean(dx: float, dy: float) -> float:
     return dxy
 
 
-def get_d_xy_f3(dx: float, dy: float) -> float:
+def get_d_xy_l3(dx: float, dy: float) -> float:
     r_3 = abs(dx * dx * dx) + abs(dy * dy * dy)
     # print(r_3)
     dxy = pow(r_3, 1.0 / 3)
     return dxy
 
 
-def get_d_xy_f3_abs(dx: float, dy: float) -> float:
+def get_d_xy_l3_abs(dx: float, dy: float) -> float:
     r_3 = dx * dx * dx + dy * dy * dy
     dxy = pow(abs(r_3), 1.0 / 3)
     return dxy
 
 
-def get_d_xy_f4(dx: float, dy: float) -> float:
+def get_d_xy_l4(dx: float, dy: float) -> float:
     r_4 = pow(dx, 4) + pow(dy, 4)
     dxy = pow(r_4, 0.25)
     return dxy
 
 
-def get_d_xy_f05(dx: float, dy: float) -> float:
+def get_d_xy_l05(dx: float, dy: float) -> float:
     r_4 = sqrt(abs(dx)) + sqrt(abs(dy))
     dxy = r_4 * r_4
     return dxy
