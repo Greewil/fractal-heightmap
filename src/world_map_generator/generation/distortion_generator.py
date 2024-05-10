@@ -49,7 +49,7 @@ class DistortionGenerator:
         self.value_matrix = np.full((self.chunk_width, self.chunk_width), 0.0)
 
     def distort_map_chunk(self, chunk_x: int, chunk_y: int, value_map: Map = None,
-                       shift_x_chunk: ValueChunk = None, shift_y_chunk: ValueChunk = None) -> ValueChunk:
+                          shift_x_chunk: ValueChunk = None, shift_y_chunk: ValueChunk = None) -> ValueChunk:
         """
         Distort specified chunk of the value_map which uses two shift maps for x-axis and y-axis.
 

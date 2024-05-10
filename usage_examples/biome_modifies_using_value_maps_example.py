@@ -12,7 +12,7 @@ from world_map_generator.utils import (get_position_seed, weighted_random_select
                                        Bounding)
 
 
-def remove_modifier(height: float, x: float, y: float, biome_parameters: dict,
+def remove_modifier(height: float, x: float, y: float, seed: int, biome_parameters: dict,
                     value_maps_values: List[float] = None) -> float:
     threshold = 0.35 * DIAMOND_SQUARE_BASE_GRID_MAX_VALUE
     if height < threshold:
@@ -26,7 +26,7 @@ def remove_modifier(height: float, x: float, y: float, biome_parameters: dict,
         return 1.5 * height + 30 - 100 * drop
 
 
-def add_modifier(height: float, x: float, y: float, biome_parameters: dict,
+def add_modifier(height: float, x: float, y: float, seed: int, biome_parameters: dict,
                  value_maps_values: List[float] = None) -> float:
     threshold = 0.75 * DIAMOND_SQUARE_BASE_GRID_MAX_VALUE
     if height < threshold:
@@ -38,7 +38,7 @@ def add_modifier(height: float, x: float, y: float, biome_parameters: dict,
         return threshold + (height - threshold) * 1.5 + 50 * drop
 
 
-def cliff_modifier(height: float, x: float, y: float, biome_parameters: dict,
+def cliff_modifier(height: float, x: float, y: float, seed: int, biome_parameters: dict,
                    value_maps_values: List[float] = None) -> float:
     threshold = 0.68 * DIAMOND_SQUARE_BASE_GRID_MAX_VALUE
     scaled_shift_map = DIAMOND_SQUARE_BASE_GRID_MAX_VALUE * value_maps_values[0]
