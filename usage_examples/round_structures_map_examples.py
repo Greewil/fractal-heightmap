@@ -12,7 +12,7 @@ from world_map_generator.generation.primitives.round_structure import RoundStruc
     LINEAR_ROUND_STRUCTURE_TYPE, STEP_ROUND_STRUCTURE_TYPE
 from world_map_generator.generation.round_structures_generator import DotsGenerator, get_value_intersection_max, \
     get_value_intersection_sum_clip, get_value_intersection_sum, get_d_xy_euclidean, get_d_xy_min, get_d_xy_l3, \
-    get_d_xy_l4, get_d_xy_l3_abs, get_d_xy_l05, get_d_xy_max, get_d_xy_euclidean_cos
+    get_d_xy_l4, get_d_xy_l3_abs, get_d_xy_l05, get_d_xy_max, get_d_xy_euclidean_cos, get_d_xy_sum
 from world_map_generator.map import Map
 from world_map_generator.map.biome import BiomeType
 from world_map_generator.rendering import save_height_map_as_image
@@ -47,8 +47,8 @@ if __name__ == '__main__':
     base_grid_distance = 64
 
     # seed = 4235214894
-    # seed = 2258822325
-    seed = None
+    seed = 668760324
+    # seed = None
 
     start = time.process_time()
     height_map = Map(seed=seed, chunk_width=chunk_width)
@@ -73,13 +73,13 @@ if __name__ == '__main__':
         round_structure_cos_cos.parameters['rotation'] = rnd[3] * 2 * np.pi
         round_structure_cos_cos.max_r = 25 + 85 * rnd[1]
         # round_structure_cos_cos.max_value = 0.25 + 0.75 * rnd[2]
-        round_structure_cos_cos.max_value = 0.25 + 0.25 * rnd[2]
+        round_structure_cos_cos.max_value = 0.25 + 0.75 * rnd[2]
         # round_structure_cos_hyperbole = deepcopy(STEP_ROUND_STRUCTURE_TYPE)
         # round_structure_cos_hyperbole = deepcopy(LINEAR_ROUND_STRUCTURE_TYPE)
         # round_structure_cos_hyperbole = deepcopy(COS_ROUND_STRUCTURE_TYPE)
         round_structure_cos_hyperbole = deepcopy(COS_HYPERBOLE_ROUND_STRUCTURE_TYPE)
         round_structure_cos_hyperbole.max_r = 25 + 50 * rnd[1]
-        round_structure_cos_hyperbole.max_value = 0.35 + 0.25 * rnd[2]
+        round_structure_cos_hyperbole.max_value = 0.35 + 0.65 * rnd[2]
         if rnd[0] > 0.5 * tile_x * 0.0035:
             return round_structure_cos_cos
         elif rnd[0] > 0.3:
@@ -89,8 +89,8 @@ if __name__ == '__main__':
 
     start = time.process_time()
     round_structures_map = Map(height_map.seed + 1, chunk_width=chunk_width)
-    generator = DotsGenerator(round_structures_map.seed, chunk_width, 100, 0.0,
-                              get_round_structure_type, get_value_intersection_sum_clip(), get_d_xy_min)
+    generator = DotsGenerator(round_structures_map.seed, chunk_width, 100, 1, 0.0,
+                              get_round_structure_type, get_value_intersection_sum_clip(), get_d_xy_sum)
                               # get_round_structure_type, get_value_intersection_sum_clip(), get_d_xy_euclidean_cos(8))
     bounding = Bounding(-2, -2, 10, 10)
     bounding.for_each(lambda x, y: round_structures_map.set_chunk(generator.generate_chunk(x, y)))

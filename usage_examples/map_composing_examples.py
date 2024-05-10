@@ -1,22 +1,12 @@
 import time
-from copy import deepcopy
 from math import sin
-from typing import Optional, Tuple, List
+from typing import Tuple, List
 
-import numpy as np
-
-from world_map_generator.default_values import DIAMOND_SQUARE_BASE_GRID_MAX_VALUE
 from world_map_generator.generation import FractalGenerator, MapComposer
-from world_map_generator.generation.primitives.round_structure import RoundStructureType, \
-    COS_COS_ROUND_STRUCTURE_TYPE, COS_HYPERBOLE_ROUND_STRUCTURE_TYPE, COS_ROUND_STRUCTURE_TYPE, \
-    LINEAR_ROUND_STRUCTURE_TYPE, STEP_ROUND_STRUCTURE_TYPE
-from world_map_generator.generation.round_structures_generator import DotsGenerator, get_value_intersection_max, \
-    get_value_intersection_sum_clip, get_value_intersection_sum, get_d_xy_euclidean, get_d_xy_min, get_d_xy_f3, \
-    get_d_xy_f4, get_d_xy_f3_abs, get_d_xy_f05, get_d_xy_max, get_d_xy_euclidean_cos
 from world_map_generator.map import Map
 from world_map_generator.map.biome import BiomeType
 from world_map_generator.rendering import save_height_map_as_image
-from world_map_generator.utils import Bounding, get_position_seed
+from world_map_generator.utils import Bounding
 
 
 if __name__ == '__main__':

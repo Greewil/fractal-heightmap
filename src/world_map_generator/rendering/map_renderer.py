@@ -11,7 +11,7 @@ from world_map_generator.utils import Bounding
 def _save_map_as_image(value_map: Map, image_name: AnyStr,
                        get_tile_color: Callable[[Union[float, object], int], Tuple[int, int, int]],
                        bounding: Bounding = None,
-                       max_value: Optional[float] = 255):
+                       max_value: Optional[float] = 255.0):
     if bounding is None:
         bounding = value_map.bounding_chunks()
     chunk_width = value_map.chunk_width
@@ -33,13 +33,14 @@ def _save_map_as_image(value_map: Map, image_name: AnyStr,
 
 
 def _get_height_color(value: float,
-                      max_color_value: Optional[float] = 255) -> Tuple[int, int, int]:
+                      max_color_value: Optional[float] = 255.0) -> Tuple[int, int, int]:
+    # print(value, max_color_value, 255.0 / max_color_value * value)
     h = math.floor(255.0 / max_color_value * value)
     return h, h, h
 
 
 def _get_biomes_color(biomes: List[Tuple[float, BiomeType]],
-                      max_color_value: Optional[float] = 255) -> Tuple[int, int, int]:
+                      max_color_value: Optional[float] = 255.0) -> Tuple[int, int, int]:
     if len(biomes) == 0:
         return 0, 0, 0
     sum_weight = 0
@@ -56,7 +57,7 @@ def _get_biomes_color(biomes: List[Tuple[float, BiomeType]],
 
 
 def save_height_map_as_image(height_map: Map, image_name: AnyStr, bounding: Bounding = None,
-                             max_color_value: Optional[float] = 255):
+                             max_color_value: Optional[float] = 255.0):
     """ Render and save heightmap region as png image.
     :param height_map: Heightmap to save.
     :param image_name: Name of the image file.
@@ -74,4 +75,4 @@ def save_biome_map_as_image(biome_map: Map, image_name: AnyStr, bounding: Boundi
     :param bounding: Rectangle bounding of the map to save (in chunks).
                      If it wasn't specified it will be set as bounding of the whole specified map.
     """
-    _save_map_as_image(biome_map, image_name, _get_biomes_color, bounding, 255)
+    _save_map_as_image(biome_map, image_name, _get_biomes_color, bounding, 255.0)

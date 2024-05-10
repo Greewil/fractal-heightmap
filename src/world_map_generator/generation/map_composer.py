@@ -4,17 +4,9 @@ import numpy as np
 
 from world_map_generator.default_values import TILES_IN_CHUNK
 from world_map_generator.map.biome import BiomeType
-from world_map_generator.map.chunk import ValueChunk, BiomeChunk, Chunk
+from world_map_generator.map.chunk import ValueChunk, Chunk
 from world_map_generator.utils import get_random_seed
-from world_map_generator.utils import get_position_seed, is_power_of_two
-
-
-def base_composing_func(seed: int, tile_x: int, tile_y: int, tiles: List[float | Tuple[float, BiomeType]]) -> float:
-    output = 0.0
-    for tile in tiles:
-        if isinstance(tile, float):
-            output += tile
-    return output
+from world_map_generator.utils import is_power_of_two
 
 
 def base_composing_func(seed: int, tile_x: int, tile_y: int, tiles: List[float | Tuple[float, BiomeType]]) -> float:

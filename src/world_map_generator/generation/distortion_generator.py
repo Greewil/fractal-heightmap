@@ -1,14 +1,12 @@
 import math
-from typing import Optional, List, Callable, Tuple
+from typing import Optional
 
 import numpy as np
 
 from world_map_generator.default_values import TILES_IN_CHUNK
 from world_map_generator.map import Map
-from world_map_generator.map.biome import BiomeType
-from world_map_generator.map.chunk import ValueChunk, BiomeChunk, Chunk
-from world_map_generator.utils import get_random_seed
-from world_map_generator.utils import get_position_seed, is_power_of_two
+from world_map_generator.map.chunk import ValueChunk
+from world_map_generator.utils import is_power_of_two
 
 
 class DistortionGenerator:
@@ -66,8 +64,8 @@ class DistortionGenerator:
             for y in range(self.chunk_width):
                 tile_x = x + chunk_x * self.chunk_width
                 tile_y = y + chunk_y * self.chunk_width
-                old_tile_x = math.floor(tile_x + self.distortion_amplitude * shift_x_chunk.get_tile(x, y))
-                old_tile_y = math.floor(tile_y + self.distortion_amplitude * shift_y_chunk.get_tile(x, y))
+                old_tile_x = math.floor(tile_x + self.distortion_amplitude * (2 * shift_x_chunk.get_tile(x, y) - 1))
+                old_tile_y = math.floor(tile_y + self.distortion_amplitude * (2 * shift_y_chunk.get_tile(x, y) - 1))
                 self.value_matrix[x, y] = value_map.get_tile(old_tile_x, old_tile_y)
 
         return ValueChunk(chunk_x, chunk_y, self.chunk_width, self.value_matrix)

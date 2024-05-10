@@ -96,6 +96,8 @@ class DotsGenerator(ChunkGenerator):
         round_structure_grid_step   Step between two closest base grid region centers.
                                     Near one region center will be created round structure
                                     selected by get_round_structure_type method.
+        center_shift_amplitude      Max value on which round structure's center could be shifted along axis.
+        filling_value               Value that will be used in empty tiles.
         get_round_structure_type    Method which contains logic about round structure type placement on map.
                                     Method returns RoundStructureType or None.
                                     Where input parameters are:
@@ -120,6 +122,7 @@ class DotsGenerator(ChunkGenerator):
 
     def __init__(self, seed: Optional[int] = None, chunk_width: Optional[int] = TILES_IN_CHUNK,
                  round_structure_grid_step: Optional[int] = ROUND_STRUCTURE_GRID_STEP,
+                 center_shift_amplitude: Optional[int] = ROUND_STRUCTURE_GRID_STEP,
                  filling_value: Optional[float] = 0.0,
                  get_round_structure_type: Callable[[int, int, int, int, int],
                                                     RoundStructureType] = get_base_round_structure_type,
@@ -134,6 +137,7 @@ class DotsGenerator(ChunkGenerator):
         :param round_structure_grid_step:   Step between two closest base grid region centers.
                                             Near one region center will be created round structure
                                             selected by get_round_structure_type method.
+        :param center_shift_amplitude:      Max value on which round structure's center could be shifted along axis.
         :param filling_value:               Value that will be used in empty tiles.
         :param get_round_structure_type:    Method which contains logic about round structure type placement on map.
                                             Method returns RoundStructureType or None.
@@ -159,6 +163,7 @@ class DotsGenerator(ChunkGenerator):
         super().__init__(seed, chunk_width)
         self.filling_value = filling_value
         self._round_structure_grid_step = round_structure_grid_step
+        self._center_shift_amplitude = center_shift_amplitude
         self._get_round_structure_type = get_round_structure_type
         self._get_value_intersection = get_value_intersection
         self._get_d_xy = get_d_xy
@@ -167,6 +172,10 @@ class DotsGenerator(ChunkGenerator):
     @property
     def round_structure_grid_step(self):
         return self._round_structure_grid_step
+
+    @property
+    def center_shift_amplitude(self):
+        return self._center_shift_amplitude
 
     @property
     def get_round_structure_type(self):
@@ -200,12 +209,13 @@ class DotsGenerator(ChunkGenerator):
     def get_round_structure_center(self, round_structure_node_x: int, round_structure_node_y: int) \
             -> Tuple[float, float]:
         """ Returns position of round structure center. """
-        # TODO add control parameter for random amplitude
         pos_seed = get_position_seed(round_structure_node_x, round_structure_node_y, self.seed)
         np.random.seed(pos_seed)
         rnd = np.random.rand(2)
-        round_structure_center_x = self.round_structure_grid_step * (round_structure_node_x + rnd[0] - 0.5)
-        round_structure_center_y = self.round_structure_grid_step * (round_structure_node_y + rnd[1] - 0.5)
+        round_structure_center_x = self.round_structure_grid_step * (
+            round_structure_node_x + self.center_shift_amplitude * (rnd[0] - 0.5))
+        round_structure_center_y = self.round_structure_grid_step * (
+            round_structure_node_y + self.center_shift_amplitude * (rnd[1] - 0.5))
         return round_structure_center_x, round_structure_center_y
 
     def get_closest_round_structures(self, chunk_x: int, chunk_y: int) -> List[RoundStructureInstance]:
@@ -237,7 +247,14 @@ class DotsGenerator(ChunkGenerator):
         return round_structures
 
     def _get_tile_value(self, x: int, y: int, round_structures: List[RoundStructureInstance]) -> float:
-        """ TODO """
+        """ Generate tile value near specified round structures.
+
+        :param x: tile x coordinate
+        :param y: tile y coordinate
+        :param round_structures: list of round structure instances which are close enough
+                                 to impact current tile generation
+        :return: output tile value
+        """
         output = self.filling_value
         for rs in round_structures:
             rs_type = rs.round_structure_type
