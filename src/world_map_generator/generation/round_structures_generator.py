@@ -164,6 +164,8 @@ class DotsGenerator(ChunkGenerator):
         self.filling_value = filling_value
         self._round_structure_grid_step = round_structure_grid_step
         self._center_shift_amplitude = center_shift_amplitude
+        if center_shift_amplitude > round_structure_grid_step:
+            raise Exception("round_structure_grid_step should be larger than center_shift_amplitude!")
         self._get_round_structure_type = get_round_structure_type
         self._get_value_intersection = get_value_intersection
         self._get_d_xy = get_d_xy
@@ -213,9 +215,9 @@ class DotsGenerator(ChunkGenerator):
         np.random.seed(pos_seed)
         rnd = np.random.rand(2)
         round_structure_center_x = self.round_structure_grid_step * (
-            round_structure_node_x + self.center_shift_amplitude * (rnd[0] - 0.5))
+            round_structure_node_x + 2 * self.center_shift_amplitude * (rnd[0] - 0.5))
         round_structure_center_y = self.round_structure_grid_step * (
-            round_structure_node_y + self.center_shift_amplitude * (rnd[1] - 0.5))
+            round_structure_node_y + 2 * self.center_shift_amplitude * (rnd[1] - 0.5))
         return round_structure_center_x, round_structure_center_y
 
     def get_closest_round_structures(self, chunk_x: int, chunk_y: int) -> List[RoundStructureInstance]:

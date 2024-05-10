@@ -34,7 +34,6 @@ def _save_map_as_image(value_map: Map, image_name: AnyStr,
 
 def _get_height_color(value: float,
                       max_color_value: Optional[float] = 255.0) -> Tuple[int, int, int]:
-    # print(value, max_color_value, 255.0 / max_color_value * value)
     h = math.floor(255.0 / max_color_value * value)
     return h, h, h
 

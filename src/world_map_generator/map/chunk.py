@@ -27,6 +27,8 @@ class Chunk:
         self.position = (x, y)
         self._chunk_width = chunk_width
         if tiles is not None:
+            if tiles.shape[0] != chunk_width and tiles.shape[1] != chunk_width:
+                raise Exception("Tiles should be matrix with size [chunk_width x chunk_width]!")
             self.tiles = tiles
         else:
             self.tiles = np.full((self.chunk_width, self.chunk_width), 0.0)
@@ -73,9 +75,6 @@ class ValueChunk(Chunk):
         :param chunk_width:     Tiles matrix size. Tile matrix size which should be [chunk_width x chunk_width].
         :param tiles:           Matrix of float values packed in numpy matrix with size [chunk_width x chunk_width].
         """
-        if tiles is not None:
-            pass
-            # TODO handle situations in which tiles are not [chunk_width x chunk_width] size
         super().__init__(x, y, chunk_width, tiles)
         if self.tiles is None:
             self.tiles = np.full((self.chunk_width, self.chunk_width), 0.0)

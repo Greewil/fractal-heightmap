@@ -67,8 +67,6 @@ class MapModifier:
                                 (min 1 additional chunk).
         :return: Modified heightmap chunk of size [chunk_width x chunk_width].
         """
-        # self._generate_random_sequence(chunk_x, chunk_y)
-        # TODO force height_modification to use either seed or generated random value
         self._clean_value_matrix()
 
         for x in range(self.chunk_width):

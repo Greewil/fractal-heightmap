@@ -257,7 +257,7 @@ class BiomeGenerator(ChunkGenerator):
                                                 closest_biomes[cur_biome_not_blended_id].biome_type))
                     else:
                         weighted_biomes.append((1, closest_biomes[cur_biome_blended_id].biome_type))
-                        # TODO maybe use few random point and then little smooth
+                        # maybe use few random point and then little smooth
                         for n in range(int(1.5 * self.biome_blend_radios)):
                             rnd = np.random.rand(2)
                             dx = int(self.biome_blend_radios * (rnd[0] - 0.5))
