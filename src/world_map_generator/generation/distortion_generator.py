@@ -66,6 +66,7 @@ class DistortionGenerator:
                 tile_y = y + chunk_y * self.chunk_width
                 old_tile_x = math.floor(tile_x + self.distortion_amplitude * (2 * shift_x_chunk.get_tile(x, y) - 1))
                 old_tile_y = math.floor(tile_y + self.distortion_amplitude * (2 * shift_y_chunk.get_tile(x, y) - 1))
+                # TODO make distortion less discrete
                 self.value_matrix[x, y] = value_map.get_tile(old_tile_x, old_tile_y)
 
         return ValueChunk(chunk_x, chunk_y, self.chunk_width, self.value_matrix)

@@ -41,7 +41,7 @@ class Map:
     def seed(self):
         return self._seed
 
-    def get_chunk(self, x: int, y: int) -> Chunk:
+    def get_chunk(self, x: int, y: int) -> Chunk | None:
         return self.chunks.get(str((x, y)), None)
 
     def set_chunk(self, chunk: Chunk):
@@ -85,7 +85,7 @@ class Map:
     def number_of_generated_chunks(self) -> int:
         return len(self.chunks.keys())
 
-    def bounding_chunks(self) -> Bounding:
+    def bounding_chunks(self) -> Bounding | None:
         """
         :return: bounding in chunks or None if there is no chunks in map
         """
@@ -105,7 +105,7 @@ class Map:
                 bounding.bottom = c.position[1]
         return bounding
 
-    def bounding_tiles(self) -> Bounding:
+    def bounding_tiles(self) -> Bounding | None:
         """
         :return: bounding in tiles or None if there is no chunks in map
         """
