@@ -27,8 +27,6 @@ class Chunk:
         self.position = (x, y)
         self._chunk_width = chunk_width
         if tiles is not None:
-            if tiles.shape[0] != chunk_width and tiles.shape[1] != chunk_width:
-                raise Exception("Tiles should be matrix with size [chunk_width x chunk_width]!")
             self.tiles = tiles
         else:
             self.tiles = np.full((self.chunk_width, self.chunk_width), 0.0)
@@ -75,6 +73,8 @@ class ValueChunk(Chunk):
         :param chunk_width:     Tiles matrix size. Tile matrix size which should be [chunk_width x chunk_width].
         :param tiles:           Matrix of float values packed in numpy matrix with size [chunk_width x chunk_width].
         """
+        if tiles is not None and (tiles.shape[0] != chunk_width or tiles.shape[1] != chunk_width):
+            raise Exception("Tiles should be matrix with size [chunk_width x chunk_width]!")
         super().__init__(x, y, chunk_width, tiles)
         if self.tiles is None:
             self.tiles = np.full((self.chunk_width, self.chunk_width), 0.0)
@@ -102,6 +102,14 @@ class BiomeChunk(Chunk):
                                 Each tile is a list of tuples.
                                 First element of each tuple is biome type weight and second is BiomeType.
         """
+        if tiles is not None and (len(tiles) != chunk_width or len(tiles[0]) != chunk_width):
+            raise Exception("Tiles should be matrix with size [chunk_width x chunk_width]!")
         super().__init__(x, y, chunk_width, tiles)
         if self.tiles is None:
             self.tiles = [[[(1, BASE_BIOME_TYPE)]] * self.chunk_width for _ in range(chunk_width)]
+
+    def get_tile(self, x: int, y: int) -> List[Tuple[float, BiomeType]]:
+        return self.tiles[x][y]
+
+    def set_tile(self, x: int, y: int, value: List[Tuple[float, BiomeType]]):
+        self.tiles[x][y] = value
