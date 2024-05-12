@@ -87,4 +87,22 @@ class BiomeInstance:
         self.biome_type = biome_type
 
 
+def biome_tile_to_dict(biome_tile: List[Tuple[float, BiomeType]]) -> dict:
+    output = {}
+    for biome in biome_tile:
+        output[biome[1].title] = biome[0]
+    return output
+
+
+def dict_to_biome(biome_tile_as_dict: dict, biomes_list: List[BiomeType]) -> List[Tuple[float, BiomeType]]:
+    """
+    TODO
+    """
+    output = []
+    for biome_type_title, weight in biome_tile_as_dict.items():
+        biome_type = biome_type_title  # TODO get from List[BiomeType]
+        output.append((weight, biome_type))
+    return output
+
+
 BASE_BIOME_TYPE = BiomeType('Base biome')

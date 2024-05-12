@@ -15,7 +15,7 @@ from world_map_generator.generation.round_structures_generator import DotsGenera
     get_d_xy_l4, get_d_xy_l3_abs, get_d_xy_l05, get_d_xy_max, get_d_xy_euclidean_cos, get_d_xy_sum
 from world_map_generator.map import Map
 from world_map_generator.map.biome import BiomeType
-from world_map_generator.map.chunk import ValueChunk
+from world_map_generator.map.chunk import ValueChunk, BiomeChunk
 from world_map_generator.rendering import save_height_map_as_image
 from world_map_generator.utils import Bounding, get_position_seed
 
@@ -146,6 +146,3 @@ if __name__ == '__main__':
     print(time.process_time() - start, 'seconds')
     print(round_structures_map.number_of_generated_chunks(), round_structures_map.number_of_generated_tiles())
     save_height_map_as_image(composed_map, 'round_structures1_composed', max_color_value=1.5)
-
-    # chunk1 = ValueChunk(1, 14, 64)
-    # chunk2 = ValueChunk(1, 14, 128, chunk1.tiles)

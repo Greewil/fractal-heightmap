@@ -1,9 +1,10 @@
+import json
 from typing import AnyStr, Optional, List, Tuple, Any
 
 import numpy as np
 
 from world_map_generator.default_values import TILES_IN_CHUNK
-from world_map_generator.map.biome import BASE_BIOME_TYPE, BiomeType
+from world_map_generator.map.biome import BASE_BIOME_TYPE, BiomeType, biome_tile_to_dict, dict_to_biome_tile
 
 
 class Chunk:
@@ -35,6 +36,10 @@ class Chunk:
     def chunk_width(self):
         return self._chunk_width
 
+    @property
+    def chunk_type(self) -> str:
+        return type(self).__name__
+
     def get_tile(self, x: int, y: int) -> float:
         return self.tiles[x][y]
 
@@ -53,6 +58,23 @@ class Chunk:
 
         output += "}"
         return output
+
+    def to_dict(self) -> dict[str, Any]:
+        tiles = [[0.0 for i in range(self.chunk_width)] for j in range(self.chunk_width)]
+        for x in range(self.chunk_width):
+            for y in range(self.chunk_width):
+                tiles[x][y] = self.get_tile(x, y)
+        chunk_dict = {
+            "chunk_width": self.chunk_width,
+            "chunk_type": self.chunk_type,
+            "x": self.position[0],
+            "y": self.position[1],
+            "tiles": tiles,
+        }
+        return chunk_dict
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_dict())
 
 
 class ValueChunk(Chunk):
@@ -78,6 +100,20 @@ class ValueChunk(Chunk):
         super().__init__(x, y, chunk_width, tiles)
         if self.tiles is None:
             self.tiles = np.full((self.chunk_width, self.chunk_width), 0.0)
+
+    def to_dict(self) -> dict[str, Any]:
+        tiles = [[0.0 for i in range(self.chunk_width)] for j in range(self.chunk_width)]
+        for x in range(self.chunk_width):
+            for y in range(self.chunk_width):
+                tiles[x][y] = self.get_tile(x, y)
+        chunk_dict = {
+            "chunk_width": self.chunk_width,
+            "chunk_type": self.chunk_type,
+            "x": self.position[0],
+            "y": self.position[1],
+            "tiles": tiles,
+        }
+        return chunk_dict
 
 
 class BiomeChunk(Chunk):
@@ -113,3 +149,48 @@ class BiomeChunk(Chunk):
 
     def set_tile(self, x: int, y: int, value: List[Tuple[float, BiomeType]]):
         self.tiles[x][y] = value
+
+    def to_dict(self) -> dict[str, Any]:
+        tiles = [[{} for i in range(self.chunk_width)] for j in range(self.chunk_width)]
+        for x in range(self.chunk_width):
+            for y in range(self.chunk_width):
+                tiles[x][y] = biome_tile_to_dict(self.get_tile(x, y))
+        chunk_dict = {
+            "chunk_width": self.chunk_width,
+            "chunk_type": self.chunk_type,
+            "x": self.position[0],
+            "y": self.position[1],
+            "tiles": tiles,
+        }
+        return chunk_dict
+
+
+def chunk_dict_to_chunk(chunk_as_dict: dict, biomes_list: List[BiomeType]) -> ValueChunk | BiomeChunk:
+    """
+    TODO
+    :param chunk_as_dict:
+    :param biomes_list: List of all possible biome types used in chunk (in case if chunk is BiomeChunk).
+
+    """
+    tiles = chunk_as_dict["tiles"]
+    chunk_width = chunk_as_dict["chunk_width"]
+    chunk_type = chunk_as_dict["chunk_type"]
+    chunk = None
+    if chunk_type == "ValueChunk":
+        chunk = ValueChunk(chunk_as_dict["x"], chunk_as_dict["y"], chunk_width)
+        for x in range(chunk.chunk_width):
+            for y in range(chunk.chunk_width):
+                chunk.tiles[x][y] = tiles[x][y]
+    elif chunk_type == "BiomeChunk":
+        chunk = BiomeChunk(chunk_as_dict["x"], chunk_as_dict["y"], chunk_width)
+        for x in range(chunk.chunk_width):
+            for y in range(chunk.chunk_width):
+                chunk.tiles[x][y] = dict_to_biome_tile(tiles[x][y], biomes_list)
+    if chunk is None:
+        raise Exception(f"Unsupported chunk type {chunk_type}")
+    return chunk
+
+
+def json_to_chunk(chunk_as_json: str) -> ValueChunk | BiomeChunk:
+    chunk_as_dict = json.loads(chunk_as_json)
+    return chunk_dict_to_chunk(chunk_as_dict)
