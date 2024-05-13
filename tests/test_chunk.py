@@ -2,27 +2,28 @@ import numpy as np
 import pytest
 from numpy.testing import assert_array_equal
 
+from world_map_generator.map.biome import BiomeType
 from world_map_generator.map.chunk import ValueChunk, chunk_dict_to_chunk, BiomeChunk, json_to_chunk
 
 
-@pytest.mark.parametrize("test_input", [
+@pytest.mark.parametrize("tile_input", [
     1.1, 0.0, -5.1,
 ])
-def test_get_set_tile_value_chunk(test_input):
+def test_get_set_tile_value_chunk(tile_input):
     chunk = ValueChunk(1, 14)
-    chunk.set_tile(0, 0, test_input)
-    assert test_input == chunk.get_tile(0, 0)
+    chunk.set_tile(0, 0, tile_input)
+    assert tile_input == chunk.get_tile(0, 0)
 
 
-@pytest.mark.skip(reason="TODO")
-@pytest.mark.parametrize("test_input", [
-    [(1.1)], [(0.0)], [(-5.1)],
+@pytest.mark.parametrize("tile_input", [
+    [(1.1, BiomeType("biome 1"))], [(1.1, BiomeType("b1")), (3, BiomeType("b2"))],
 ])
-def test_get_set_tile_biome_chunk(test_input):
-    # TODO
-    chunk = ValueChunk(1, 14)
-    chunk.set_tile(0, 0, test_input)
-    assert test_input == chunk.get_tile(0, 0)
+def test_get_set_tile_biome_chunk(tile_input):
+    chunk = BiomeChunk(1, 14)
+    chunk.set_tile(0, 0, tile_input)
+    for n, weighted_biome in enumerate(tile_input):
+        assert weighted_biome[0] == chunk.get_tile(0, 0)[n][0]
+        assert weighted_biome[1].title == chunk.get_tile(0, 0)[n][1].title
 
 
 def test_copy_value_chunk():
@@ -56,8 +57,8 @@ def test_invalid_copy_biome_chunk():
 def test_get_chunk_type():
     value_chunk = ValueChunk(1, 1)
     biome_chunk = BiomeChunk(1, 1)
-    assert value_chunk.chunk_type == 'ValueChunk'
-    assert biome_chunk.chunk_type == 'BiomeChunk'
+    assert value_chunk.chunk_type == "ValueChunk"
+    assert biome_chunk.chunk_type == "BiomeChunk"
 
 
 def test_convert_value_chunk_to_dict():
