@@ -44,13 +44,13 @@ def test_copy_biome_chunk():
 def test_invalid_copy_value_chunk():
     with pytest.raises(Exception):
         chunk1 = ValueChunk(1, 14, 64)
-        chunk2 = ValueChunk(1, 14, 128, chunk1.tiles)
+        ValueChunk(1, 14, 128, chunk1.tiles)
 
 
 def test_invalid_copy_biome_chunk():
     with pytest.raises(Exception):
         chunk1 = BiomeChunk(1, 14, 64)
-        chunk2 = BiomeChunk(1, 14, 128, chunk1.tiles)
+        BiomeChunk(1, 14, 128, chunk1.tiles)
 
 
 def test_get_chunk_type():

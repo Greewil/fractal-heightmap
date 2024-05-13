@@ -1,9 +1,7 @@
-import numpy as np
 import pytest
-from numpy.testing import assert_array_equal
 
 from world_map_generator.map import Map
-from world_map_generator.map.chunk import ValueChunk, chunk_dict_to_chunk, BiomeChunk
+from world_map_generator.map.chunk import ValueChunk, BiomeChunk
 from world_map_generator.utils import Bounding
 
 
