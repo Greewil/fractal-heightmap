@@ -14,7 +14,7 @@ from world_map_generator.utils import Bounding, get_position_seed
 
 BIOME_EXAMPLES_COUNT = 6
 
-biome_examples = [BiomeType(title=f'biome {i}') for i in range(BIOME_EXAMPLES_COUNT)]
+biome_type_examples = [BiomeType(title=f'biome {i}') for i in range(BIOME_EXAMPLES_COUNT)]
 
 
 def generate_base_height_map(bounding: Bounding) -> Map:
@@ -23,7 +23,7 @@ def generate_base_height_map(bounding: Bounding) -> Map:
     generator = FractalGenerator(height_map.seed, base_grid_max_value=1.0)
     start = time.process_time()
     bounding.for_each(lambda x, y: height_map.set_chunk(generator.generate_chunk(x, y)))
-    print(time.process_time() - start, 'seconds')
+    print(f'{time.process_time() - start:.3f}', 'seconds')
     return height_map
 
 
@@ -32,14 +32,14 @@ def generate_base_biome_map(bounding: Bounding, shift_map: Map) -> Map:
         pos_seed = get_position_seed(biome_node_x, biome_node_y, seed)
         np.random.seed(pos_seed)
         biome_index = floor(np.random.rand() * BIOME_EXAMPLES_COUNT)
-        return biome_examples[biome_index]
+        return biome_type_examples[biome_index]
 
     biome_map = Map()
     print(f'biome map seed = {biome_map.seed}')
     generator = BiomeGenerator(biome_map.seed, get_biome_type=get_random_biome_example)
     start = time.process_time()
     bounding.for_each(lambda x, y: biome_map.set_chunk(generator.generate_chunk(x, y, [shift_map])))
-    print(time.process_time() - start, 'seconds')
+    print(f'{time.process_time() - start:.3f}', 'seconds')
     return biome_map
 
 
@@ -54,7 +54,7 @@ if __name__ == '__main__':
 
     # convert value chunk to json back and force
     value_chunk_json_str = height_map.get_chunk(1, 1).to_json()
-    value_chunk = json_to_chunk(value_chunk_json_str)
+    value_chunk = json_to_chunk(value_chunk_json_str, biome_type_examples)
 
     # convert biome chunk to json back and force
     biome_chunk_json_str = biome_map.get_chunk(1, 1).to_json()
@@ -69,7 +69,7 @@ if __name__ == '__main__':
     # convert biome map region to json back and force
     biome_map_as_matrix_json_str = biome_map.to_json_as_one_tile_matrix()
     biome_map_as_chunks_list_json_str = biome_map.to_json()
-    biome_map_restored = json_to_map(biome_map_as_chunks_list_json_str, biome_examples)
+    biome_map_restored = json_to_map(biome_map_as_chunks_list_json_str, biome_type_examples)
 
     # save jsons
     with open('value_chunk.json', 'w') as file:
@@ -87,5 +87,5 @@ if __name__ == '__main__':
 
     # save restored maps as images
     save_height_map_as_image(height_map_restored, 'height_map_restored_from_json', max_color_value=1.5)
-    save_biome_map_as_image(biome_map, 'biome_map_restored_from_json')
-    # save_biome_map_as_image(biome_map_restored, 'biome_map_restored_from_json')
+    save_biome_map_as_image(biome_map, 'biome_map_to_convert_to_json')
+    save_biome_map_as_image(biome_map_restored, 'biome_map_restored_from_json')

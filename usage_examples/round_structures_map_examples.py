@@ -1,11 +1,9 @@
 import time
 from copy import deepcopy
-from math import sin
 from typing import Optional, Tuple, List
 
 import numpy as np
 
-from world_map_generator.default_values import DIAMOND_SQUARE_BASE_GRID_MAX_VALUE
 from world_map_generator.generation import FractalGenerator, MapComposer, DistortionGenerator
 from world_map_generator.generation.primitives.round_structure import RoundStructureType, \
     COS_COS_ROUND_STRUCTURE_TYPE, COS_HYPERBOLE_ROUND_STRUCTURE_TYPE, COS_ROUND_STRUCTURE_TYPE, \
@@ -15,7 +13,6 @@ from world_map_generator.generation.round_structures_generator import DotsGenera
     get_d_xy_l4, get_d_xy_l3_abs, get_d_xy_l05, get_d_xy_max, get_d_xy_euclidean_cos, get_d_xy_sum
 from world_map_generator.map import Map
 from world_map_generator.map.biome import BiomeType
-from world_map_generator.map.chunk import ValueChunk, BiomeChunk
 from world_map_generator.rendering import save_height_map_as_image
 from world_map_generator.utils import Bounding, get_position_seed
 
@@ -91,12 +88,14 @@ if __name__ == '__main__':
     start = time.process_time()
     round_structures_map = Map(height_map.seed + 1, chunk_width=chunk_width)
     generator = DotsGenerator(round_structures_map.seed, chunk_width, 100, 1, 0.0,
-                              get_round_structure_type, get_value_intersection_sum_clip(), get_d_xy_sum)
                               # get_round_structure_type, get_value_intersection_sum_clip(), get_d_xy_euclidean_cos(8))
+                              get_round_structure_type, get_value_intersection_sum_clip(), get_d_xy_sum)
     bounding = Bounding(-2, -2, 10, 10)
     bounding.for_each(lambda x, y: round_structures_map.set_chunk(generator.generate_chunk(x, y)))
     print(time.process_time() - start, 'seconds')
     save_height_map_as_image(round_structures_map, 'round_structures1', max_color_value=2)
+
+    # TODO move all redundant code to another examples
 
     start = time.process_time()
     bounding = Bounding(-1, -1, 9, 9)

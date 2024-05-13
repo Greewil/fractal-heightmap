@@ -9,7 +9,7 @@ from scipy.spatial import Voronoi
 from world_map_generator.default_values import TILES_IN_CHUNK, BIOME_GRID_STEP, BIOME_BLEND_RADIOS
 from .chunk_generator import ChunkGenerator
 from world_map_generator.map import Map
-from world_map_generator.map.biome import BiomeType, BiomeInstance, BASE_BIOME_TYPE
+from world_map_generator.map.biome import BiomeType, BiomeInstance, BASE_BIOME_TYPE, add_biome_to_biome_tile
 from world_map_generator.map.chunk import BiomeChunk
 from world_map_generator.utils import Bounding
 from world_map_generator.utils import get_position_seed
@@ -246,17 +246,20 @@ class BiomeGenerator(ChunkGenerator):
                 in_chunk_x, in_chunk_y = i - self.biome_blend_radios, j - self.biome_blend_radios
                 weighted_biomes = self.value_matrix[i - self.biome_blend_radios][j - self.biome_blend_radios]
                 if not borders_smoothing:
-                    weighted_biomes.append((1, closest_biomes[cur_biome_not_blended_id].biome_type))
+                    weighted_biome_type = (1, closest_biomes[cur_biome_not_blended_id].biome_type)
+                    add_biome_to_biome_tile(weighted_biomes, weighted_biome_type)
                 else:
                     shift_x = int(self.biome_blend_radios * (shift_map_x[in_chunk_x, in_chunk_y] - 0.5))
                     shift_y = int(self.biome_blend_radios * (shift_map_y[in_chunk_x, in_chunk_y] - 0.5))
                     cur_biome_blended_id = np_voronoi_image[j + shift_x, i + shift_y]
                     cur_biome_not_blended_id = np_voronoi_bordered_image[j + shift_x, i + shift_y]
                     if cur_biome_not_blended_id != self._blending_point_code:
-                        weighted_biomes.append((shift_map_x[in_chunk_x, in_chunk_y],
-                                                closest_biomes[cur_biome_not_blended_id].biome_type))
+                        weighted_biome_type = (shift_map_x[in_chunk_x, in_chunk_y],
+                                               closest_biomes[cur_biome_not_blended_id].biome_type)
+                        add_biome_to_biome_tile(weighted_biomes, weighted_biome_type)
                     else:
-                        weighted_biomes.append((1, closest_biomes[cur_biome_blended_id].biome_type))
+                        weighted_biome_type = (1, closest_biomes[cur_biome_blended_id].biome_type)
+                        add_biome_to_biome_tile(weighted_biomes, weighted_biome_type)
                         # maybe use few random point and then little smooth
                         for n in range(int(1.5 * self.biome_blend_radios)):
                             rnd = np.random.rand(2)
@@ -266,7 +269,8 @@ class BiomeGenerator(ChunkGenerator):
                             # if cur_biome_blended_id != additional_biome_id:
                             if dx != 0 or dy != 0:
                                 blend_weight = 1 / math.sqrt(dx * dx + dy * dy)
-                                weighted_biomes.append((blend_weight, closest_biomes[additional_biome_id].biome_type))
+                                weighted_biome_type = (blend_weight, closest_biomes[additional_biome_id].biome_type)
+                                add_biome_to_biome_tile(weighted_biomes, weighted_biome_type)
 
         output_chunk = BiomeChunk(chunk_x, chunk_y, self.chunk_width, self.value_matrix)
         return output_chunk

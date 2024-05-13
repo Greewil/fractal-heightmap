@@ -14,7 +14,8 @@ class Map:
     Attributes:
         seed               Number which is used in procedural generation.
                            If it wasn't specified it will be generated randomly.
-        chunk_type         TODO Chunk size which defines tiles matrix.
+        chunk_type         Type of the first added chunk or None if map didn't filled with any chunks yet.
+                           It is basically chunk's class name (f.e. ValueChunk or BiomeChunk).
         chunk_width        Chunk size which defines tiles matrix.
                            Tile matrix size which should be [chunk_width x chunk_width].
                            Chunk width should be the power of 2.
@@ -37,15 +38,15 @@ class Map:
         self.chunks = {}
 
     @property
-    def chunk_width(self):
+    def chunk_width(self) -> int:
         return self._chunk_width
 
     @property
-    def seed(self):
+    def seed(self) -> int:
         return self._seed
 
     @property
-    def chunk_type(self):
+    def chunk_type(self) -> str | None:
         if self.chunks is None or len(self.chunks) == 0:
             return None
         first_chunk = next(iter(self.chunks))
@@ -156,8 +157,8 @@ class Map:
         tiles_x_size = self.chunk_width * (chunks_bounding.right - chunks_bounding.left)
         tiles_y_size = self.chunk_width * (chunks_bounding.top - chunks_bounding.bottom)
         chunks_list = []
-        for i in range(chunks_bounding.left, chunks_bounding.right):
-            for j in range(chunks_bounding.bottom, chunks_bounding.top):
+        for i in range(chunks_bounding.left, chunks_bounding.right + 1):
+            for j in range(chunks_bounding.bottom, chunks_bounding.top + 1):
                 chunk = self.get_chunk(i, j)
                 if chunk is not None:
                     chunks_list.append(chunk)
@@ -221,12 +222,13 @@ class Map:
         return json.dumps(map_region)
 
 
-def map_as_dict_to_map(map_as_dict: dict, biomes_list: List[BiomeType]) -> Map:
+def map_as_dict_to_map(map_as_dict: dict, biomes_list: List[BiomeType] = None) -> Map:
     """
-    TODO
+    Converts map represented as dictionary to map object.
 
-
+    :param map_as_dict: Map represented as dictionary.
     :param biomes_list: List of all possible biome types used in map (in case if map filled with BiomeChunks).
+    :return: Map object.
     """
     seed = map_as_dict["seed"]
     chunk_width = map_as_dict["chunk_width"]
@@ -237,6 +239,13 @@ def map_as_dict_to_map(map_as_dict: dict, biomes_list: List[BiomeType]) -> Map:
     return converted_map
 
 
-def json_to_map(map_as_json: str) -> Map:
+def json_to_map(map_as_json: str, biomes_list: List[BiomeType] = None) -> Map:
+    """
+    Converts map represented as json string to map object.
+
+    :param map_as_json: Map represented as json string.
+    :param biomes_list: List of all possible biome types used in map (in case if map filled with BiomeChunks).
+    :return: Map object.
+    """
     map_as_dict = json.loads(map_as_json)
-    return map_as_dict_to_map(map_as_dict)
+    return map_as_dict_to_map(map_as_dict, biomes_list)

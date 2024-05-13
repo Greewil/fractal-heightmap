@@ -87,21 +87,57 @@ class BiomeInstance:
         self.biome_type = biome_type
 
 
+def is_biome_tiles_same(biome_tile_1: List[Tuple[float, BiomeType]],
+                        biome_tile_2: List[Tuple[float, BiomeType]]) -> bool:
+    """ Checks if biome tiles are the same (have the same titles and parameters). """
+    if (biome_tile_1.title == biome_tile_2.title
+            and biome_tile_1.biome_parameters == biome_tile_2.biome_parameters):
+        return True
+    else:
+        return False
+
+
+def add_biome_to_biome_tile(biome_tile: List[Tuple[float, BiomeType]], weighted_biome_tile: Tuple[float, BiomeType]):
+    """
+    Adds new tuple if biome tile don't have same biome types yet (with same titles and parameters),
+    otherwise adds weight of new tile to weight of same biome type.
+    """
+    is_collisions = False
+    for i in range(len(biome_tile)):
+        weight, biome_type = biome_tile[i]
+        if is_biome_tiles_same(biome_type, weighted_biome_tile[1]):
+            biome_tile[i] = (weighted_biome_tile[0] + weight, biome_type)
+            is_collisions = True
+            break
+    if not is_collisions:
+        biome_tile.append(weighted_biome_tile)
+
+
 def biome_tile_to_dict(biome_tile: List[Tuple[float, BiomeType]]) -> dict:
     output = {}
     for biome in biome_tile:
         output[biome[1].title] = biome[0]
+    # TODO save parameters
+    # if len(biome_tile) > 1:
+    #     print(len(biome_tile), biome_tile)
+    #     print(output)
     return output
 
 
-def dict_to_biome(biome_tile_as_dict: dict, biomes_list: List[BiomeType]) -> List[Tuple[float, BiomeType]]:
+def dict_to_biome_tile(biome_tile_as_dict: dict, biomes_list: List[BiomeType]) -> List[Tuple[float, BiomeType]]:
     """
-    TODO
+    Converts biome tile represented as dictionary to biome tile structure (list of tuples with weights and biome types).
+
+    :param biome_tile_as_dict: Biome tile represented as dictionary.
+    :param biomes_list: List of all possible biome types used in map (in case if map filled with BiomeChunks).
+    :return: biome tile structure (list of tuples with weights and biome types).
     """
     output = []
     for biome_type_title, weight in biome_tile_as_dict.items():
-        biome_type = biome_type_title  # TODO get from List[BiomeType]
-        output.append((weight, biome_type))
+        biome_type = next((b for b in biomes_list if b.title == biome_type_title), None)
+        if biome_type is None:
+            raise Exception(f"Biome type {biome_type_title} not found in biomes_list")
+        add_biome_to_biome_tile(output, (weight, biome_type))
     return output
 
 

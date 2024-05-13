@@ -14,6 +14,7 @@ class Chunk:
         x               Global x position in chunk grid.
         y               Global y position in chunk grid.
         chunk_width     Tiles matrix size. Tile matrix size which should be [chunk_width x chunk_width].
+        chunk_type      Type of the chunk which is basically is class name (f.e. ValueChunk or BiomeChunk).
         tiles           Matrix of float values packed in numpy matrix with size [chunk_width x chunk_width].
     """
 
@@ -33,14 +34,14 @@ class Chunk:
             self.tiles = np.full((self.chunk_width, self.chunk_width), 0.0)
 
     @property
-    def chunk_width(self):
+    def chunk_width(self) -> int:
         return self._chunk_width
 
     @property
     def chunk_type(self) -> str:
         return type(self).__name__
 
-    def get_tile(self, x: int, y: int) -> float:
+    def get_tile(self, x: int, y: int) -> np.ndarray[Any, np.dtype[Any]]:
         return self.tiles[x][y]
 
     def set_tile(self, x: int, y: int, value: float):
@@ -98,7 +99,7 @@ class ValueChunk(Chunk):
         if tiles is not None and (tiles.shape[0] != chunk_width or tiles.shape[1] != chunk_width):
             raise Exception("Tiles should be matrix with size [chunk_width x chunk_width]!")
         super().__init__(x, y, chunk_width, tiles)
-        if self.tiles is None:
+        if tiles is None:
             self.tiles = np.full((self.chunk_width, self.chunk_width), 0.0)
 
     def to_dict(self) -> dict[str, Any]:
@@ -141,7 +142,7 @@ class BiomeChunk(Chunk):
         if tiles is not None and (len(tiles) != chunk_width or len(tiles[0]) != chunk_width):
             raise Exception("Tiles should be matrix with size [chunk_width x chunk_width]!")
         super().__init__(x, y, chunk_width, tiles)
-        if self.tiles is None:
+        if tiles is None:
             self.tiles = [[[(1, BASE_BIOME_TYPE)]] * self.chunk_width for _ in range(chunk_width)]
 
     def get_tile(self, x: int, y: int) -> List[Tuple[float, BiomeType]]:
@@ -165,12 +166,13 @@ class BiomeChunk(Chunk):
         return chunk_dict
 
 
-def chunk_dict_to_chunk(chunk_as_dict: dict, biomes_list: List[BiomeType]) -> ValueChunk | BiomeChunk:
+def chunk_dict_to_chunk(chunk_as_dict: dict, biomes_list: List[BiomeType] = None) -> ValueChunk | BiomeChunk:
     """
-    TODO
-    :param chunk_as_dict:
-    :param biomes_list: List of all possible biome types used in chunk (in case if chunk is BiomeChunk).
+    Converts chunk represented as dictionary to chunk object.
 
+    :param chunk_as_dict: Chunk represented as dictionary.
+    :param biomes_list: List of all possible biome types used in chunk (in case if chunk is BiomeChunk).
+    :return: Chunk object.
     """
     tiles = chunk_as_dict["tiles"]
     chunk_width = chunk_as_dict["chunk_width"]
@@ -180,17 +182,24 @@ def chunk_dict_to_chunk(chunk_as_dict: dict, biomes_list: List[BiomeType]) -> Va
         chunk = ValueChunk(chunk_as_dict["x"], chunk_as_dict["y"], chunk_width)
         for x in range(chunk.chunk_width):
             for y in range(chunk.chunk_width):
-                chunk.tiles[x][y] = tiles[x][y]
+                chunk.set_tile(x, y, tiles[x][y])
     elif chunk_type == "BiomeChunk":
         chunk = BiomeChunk(chunk_as_dict["x"], chunk_as_dict["y"], chunk_width)
         for x in range(chunk.chunk_width):
             for y in range(chunk.chunk_width):
-                chunk.tiles[x][y] = dict_to_biome_tile(tiles[x][y], biomes_list)
+                chunk.set_tile(x, y, dict_to_biome_tile(tiles[x][y], biomes_list))
     if chunk is None:
         raise Exception(f"Unsupported chunk type {chunk_type}")
     return chunk
 
 
-def json_to_chunk(chunk_as_json: str) -> ValueChunk | BiomeChunk:
+def json_to_chunk(chunk_as_json: str, biomes_list: List[BiomeType] = None) -> ValueChunk | BiomeChunk:
+    """
+    Converts chunk represented as json string to chunk object.
+
+    :param chunk_as_json: Chunk represented as json string.
+    :param biomes_list: List of all possible biome types used in chunk (in case if chunk is BiomeChunk).
+    :return: Chunk object.
+    """
     chunk_as_dict = json.loads(chunk_as_json)
-    return chunk_dict_to_chunk(chunk_as_dict)
+    return chunk_dict_to_chunk(chunk_as_dict, biomes_list)
