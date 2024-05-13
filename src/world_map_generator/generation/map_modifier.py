@@ -2,7 +2,7 @@ from typing import Optional, List
 
 import numpy as np
 
-from world_map_generator.default_values import TILES_IN_CHUNK
+from world_map_generator.default_values import DEFAULT_CHUNK_WIDTH
 from world_map_generator.map.chunk import ValueChunk, BiomeChunk, Chunk
 from world_map_generator.utils import get_random_seed
 from world_map_generator.utils import is_power_of_two
@@ -19,7 +19,7 @@ class MapModifier:
                            Chunk width should be the power of 2.
     """
 
-    def __init__(self, seed: Optional[int] = None, chunk_width: Optional[int] = TILES_IN_CHUNK) -> None:
+    def __init__(self, seed: Optional[int] = None, chunk_width: Optional[int] = DEFAULT_CHUNK_WIDTH) -> None:
         """ Heightmap modifier which uses biomes map to apply corresponding height_modification.
         :param seed:        Number which is used in procedural generation.
                             If it wasn't specified it will be generated randomly.

@@ -3,7 +3,7 @@ from typing import AnyStr, Optional, List, Tuple, Any
 
 import numpy as np
 
-from world_map_generator.default_values import TILES_IN_CHUNK
+from world_map_generator.default_values import DEFAULT_CHUNK_WIDTH
 from world_map_generator.map.biome import BASE_BIOME_TYPE, BiomeType, biome_tile_to_dict, dict_to_biome_tile
 
 
@@ -18,7 +18,7 @@ class Chunk:
         tiles           Matrix of float values packed in numpy matrix with size [chunk_width x chunk_width].
     """
 
-    def __init__(self, x: int, y: int, chunk_width: Optional[int] = TILES_IN_CHUNK,
+    def __init__(self, x: int, y: int, chunk_width: Optional[int] = DEFAULT_CHUNK_WIDTH,
                  tiles: Optional[np.ndarray[Any, np.dtype]] = None):
         """Chunk with tiles packed in numpy matrix.
         :param x:               Global x position in chunk grid.
@@ -88,7 +88,7 @@ class ValueChunk(Chunk):
         tiles           Matrix of float values packed in numpy matrix with size [chunk_width x chunk_width].
     """
 
-    def __init__(self, x: int, y: int, chunk_width: Optional[int] = TILES_IN_CHUNK,
+    def __init__(self, x: int, y: int, chunk_width: Optional[int] = DEFAULT_CHUNK_WIDTH,
                  tiles: Optional[np.ndarray[Any, np.dtype]] = None):
         """Chunk with tiles packed in numpy matrix.
         :param x:               Global x position in chunk grid.
@@ -129,7 +129,7 @@ class BiomeChunk(Chunk):
                         First element of each tuple is biome type weight and second is BiomeType.
     """
 
-    def __init__(self, x: int, y: int, chunk_width: Optional[int] = TILES_IN_CHUNK,
+    def __init__(self, x: int, y: int, chunk_width: Optional[int] = DEFAULT_CHUNK_WIDTH,
                  tiles: Optional[List[List[List[Tuple[float, BiomeType]]]]] = None):
         """Chunk with information about biomes types and their weights in tiles.
         :param x:               Global x position in chunk grid.

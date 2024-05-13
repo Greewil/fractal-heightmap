@@ -3,8 +3,8 @@ from typing import Optional, Any
 
 import numpy as np
 
-from world_map_generator.default_values import TILES_IN_CHUNK, DIAMOND_SQUARE_GRID_STEP, \
-    DIAMOND_SQUARE_BASE_GRID_MAX_VALUE
+from world_map_generator.default_values import DEFAULT_CHUNK_WIDTH, DEFAULT_DIAMOND_SQUARE_GRID_STEP, \
+    DEFAULT_DIAMOND_SQUARE_GRID_MAX_VALUE
 from .chunk_generator import ChunkGenerator
 from world_map_generator.map.chunk import ValueChunk
 from world_map_generator.utils import Bounding
@@ -36,9 +36,9 @@ class FractalGenerator(ChunkGenerator):
                                     and second element in tuple is radius for x-shape.
     """
 
-    def __init__(self, seed: Optional[int] = None, chunk_width: Optional[int] = TILES_IN_CHUNK,
-                 base_grid_distance: Optional[int] = DIAMOND_SQUARE_GRID_STEP,
-                 base_grid_max_value: Optional[float] = DIAMOND_SQUARE_BASE_GRID_MAX_VALUE) -> None:
+    def __init__(self, seed: Optional[int] = None, chunk_width: Optional[int] = DEFAULT_CHUNK_WIDTH,
+                 base_grid_distance: Optional[int] = DEFAULT_DIAMOND_SQUARE_GRID_STEP,
+                 base_grid_max_value: Optional[float] = DEFAULT_DIAMOND_SQUARE_GRID_MAX_VALUE) -> None:
         """ Generator of value map chunks based on diamond square algorithm.
         :param seed:                Number which is used in procedural generation.
                                     If it wasn't specified it will be generated randomly.

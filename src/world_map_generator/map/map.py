@@ -1,7 +1,7 @@
 import json
 from typing import AnyStr, Optional, Union, Callable, List
 
-from world_map_generator.default_values import TILES_IN_CHUNK
+from world_map_generator.default_values import DEFAULT_CHUNK_WIDTH
 from world_map_generator.utils import Bounding
 from world_map_generator.utils import get_random_seed
 from .biome import biome_tile_to_dict, BiomeType
@@ -22,7 +22,7 @@ class Map:
         chunks             Dict of chunks where hash based on chunk position (str((x, y))).
     """
 
-    def __init__(self, seed: Optional[int] = None, chunk_width: Optional[int] = TILES_IN_CHUNK):
+    def __init__(self, seed: Optional[int] = None, chunk_width: Optional[int] = DEFAULT_CHUNK_WIDTH):
         """ Collection of chunks, which are generated with specified seed.
         :param seed:        Number which is used in procedural generation.
                             If it wasn't specified it will be generated randomly.

@@ -3,7 +3,7 @@ from typing import Optional, Callable, List, Tuple
 
 import numpy as np
 
-from world_map_generator.default_values import TILES_IN_CHUNK, ROUND_STRUCTURE_GRID_STEP
+from world_map_generator.default_values import DEFAULT_CHUNK_WIDTH, DEFAULT_ROUND_STRUCTURE_GRID_STEP
 from .chunk_generator import ChunkGenerator
 from world_map_generator.generation.primitives.round_structure import STEP_ROUND_STRUCTURE_TYPE, RoundStructureType, \
     RoundStructureInstance
@@ -120,9 +120,9 @@ class DotsGenerator(ChunkGenerator):
                                         dy - y distance which equals: y1 - y2 (float).
     """
 
-    def __init__(self, seed: Optional[int] = None, chunk_width: Optional[int] = TILES_IN_CHUNK,
-                 round_structure_grid_step: Optional[int] = ROUND_STRUCTURE_GRID_STEP,
-                 center_shift_amplitude: Optional[int] = ROUND_STRUCTURE_GRID_STEP,
+    def __init__(self, seed: Optional[int] = None, chunk_width: Optional[int] = DEFAULT_CHUNK_WIDTH,
+                 round_structure_grid_step: Optional[int] = DEFAULT_ROUND_STRUCTURE_GRID_STEP,
+                 center_shift_amplitude: Optional[int] = DEFAULT_ROUND_STRUCTURE_GRID_STEP,
                  filling_value: Optional[float] = 0.0,
                  get_round_structure_type: Callable[[int, int, int, int, int],
                                                     RoundStructureType] = get_base_round_structure_type,

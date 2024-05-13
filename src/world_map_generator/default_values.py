@@ -2,29 +2,29 @@
 GENERATOR_VERSION = '0.3.0'
 
 # General generators parameters
-TILES_IN_CHUNK = 64
+DEFAULT_CHUNK_WIDTH = 64  # TODO rename
 
 # Fractal map generation
-DIAMOND_SQUARE_GRID_STEP = 64
-DIAMOND_SQUARE_BASE_GRID_MAX_VALUE = 100
+DEFAULT_DIAMOND_SQUARE_GRID_STEP = 64
+DEFAULT_DIAMOND_SQUARE_GRID_MAX_VALUE = 100
 
 # Biome generation
-# BIOME_GRID_STEP:      Distance between biome grid cells.
-#                       Near each node will be created biome with central position +- half of grid step.
-#                       Biomes area will be calculated with Voronoi algorithm.
-BIOME_GRID_STEP = 128
-# BIOME_BLEND_RADIOS:   Radios of borders smoothing between biomes.
-#                       After smoothing  each point near biome borders will have average nearby biomes
-#                       values with weights.
-BIOME_BLEND_RADIOS = 15
+# DEFAULT_BIOME_GRID_STEP:  Distance between biome grid cells.
+#                           Near each node will be created biome with central position +- half of grid step.
+#                           Biomes area will be calculated with Voronoi algorithm.
+DEFAULT_BIOME_GRID_STEP = 128
+# DEFAULT_BIOME_BLEND_RADIOS:   Radios of borders smoothing between biomes.
+#                               After smoothing  each point near biome borders will have average nearby biomes
+#                               values with weights.
+DEFAULT_BIOME_BLEND_RADIOS = 15
 
 # Round structures generation
-# ROUND_STRUCTURE_GRID_STEP:        Distance between round structure grid cells.
-#                                   Near each node will be created round structure with central
-#                                   position +- half of grid step.
-ROUND_STRUCTURE_GRID_STEP = 64
-# ROUND_STRUCTURE_BASE_MAX_RADIUS:  Maximum distance from round structure center
-#                                   which can be handled due generation.
-ROUND_STRUCTURE_BASE_MAX_RADIUS = 100
-# ROUND_STRUCTURE_BASE_MAX_VALUE:  Maximum value that can be generated with current round structure.
-ROUND_STRUCTURE_BASE_MAX_VALUE = 1
+# DEFAULT_ROUND_STRUCTURE_GRID_STEP:    Distance between round structure grid cells.
+#                                       Near each node will be created round structure with central
+#                                       position +- half of grid step.
+DEFAULT_ROUND_STRUCTURE_GRID_STEP = 64
+# DEFAULT_ROUND_STRUCTURE_MAX_RADIUS:   Maximum distance from round structure center
+#                                       which can be handled due generation.
+DEFAULT_ROUND_STRUCTURE_MAX_RADIUS = 100
+# DEFAULT_ROUND_STRUCTURE_MAX_VALUE:    Maximum value that can be generated with current round structure.
+DEFAULT_ROUND_STRUCTURE_MAX_VALUE = 1

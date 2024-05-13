@@ -6,7 +6,7 @@ import PIL.Image as Image
 import PIL.ImageDraw as ImageDraw
 from scipy.spatial import Voronoi
 
-from world_map_generator.default_values import TILES_IN_CHUNK, BIOME_GRID_STEP, BIOME_BLEND_RADIOS
+from world_map_generator.default_values import DEFAULT_CHUNK_WIDTH, DEFAULT_BIOME_GRID_STEP, DEFAULT_BIOME_BLEND_RADIOS
 from .chunk_generator import ChunkGenerator
 from world_map_generator.map import Map
 from world_map_generator.map.biome import BiomeType, BiomeInstance, BASE_BIOME_TYPE, add_biome_to_biome_tile
@@ -37,9 +37,9 @@ class BiomeGenerator(ChunkGenerator):
                                 Method returns BiomeType.
     """
 
-    def __init__(self, seed: Optional[int] = None, chunk_width: Optional[int] = TILES_IN_CHUNK,
-                 biome_grid_step: Optional[int] = BIOME_GRID_STEP,
-                 biome_blend_radios: Optional[int] = BIOME_BLEND_RADIOS,
+    def __init__(self, seed: Optional[int] = None, chunk_width: Optional[int] = DEFAULT_CHUNK_WIDTH,
+                 biome_grid_step: Optional[int] = DEFAULT_BIOME_GRID_STEP,
+                 biome_blend_radios: Optional[int] = DEFAULT_BIOME_BLEND_RADIOS,
                  get_biome_type: Callable[[int, int, int], BiomeType] = get_base_biome_type):
         """ Generator of biome map chunks based on voronoi algorithm.
         :param seed:                Number which is used in procedural generation.

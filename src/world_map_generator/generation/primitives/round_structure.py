@@ -2,7 +2,7 @@ from typing import Optional, Callable
 
 from numpy import pi, cos
 
-from world_map_generator.default_values import ROUND_STRUCTURE_BASE_MAX_RADIUS, ROUND_STRUCTURE_BASE_MAX_VALUE
+from world_map_generator.default_values import DEFAULT_ROUND_STRUCTURE_MAX_RADIUS, DEFAULT_ROUND_STRUCTURE_MAX_VALUE
 
 
 def step_radius_function(r: float, max_r: float, dx: float, dy: float, max_value: float,
@@ -55,8 +55,8 @@ class RoundStructureType:
 
     def __init__(self,
                  title: str,
-                 max_r: float = ROUND_STRUCTURE_BASE_MAX_RADIUS,
-                 max_value: float = ROUND_STRUCTURE_BASE_MAX_VALUE,
+                 max_r: float = DEFAULT_ROUND_STRUCTURE_MAX_RADIUS,
+                 max_value: float = DEFAULT_ROUND_STRUCTURE_MAX_VALUE,
                  radius_function: Optional[Callable[[float, float, float, dict], float]] = step_radius_function,
                  parameters: Optional[dict] = None):
         """ Type of round structure instance.

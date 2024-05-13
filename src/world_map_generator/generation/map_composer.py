@@ -2,7 +2,7 @@ from typing import Optional, List, Callable, Tuple
 
 import numpy as np
 
-from world_map_generator.default_values import TILES_IN_CHUNK
+from world_map_generator.default_values import DEFAULT_CHUNK_WIDTH
 from world_map_generator.map.biome import BiomeType
 from world_map_generator.map.chunk import ValueChunk, Chunk
 from world_map_generator.utils import get_random_seed
@@ -37,7 +37,7 @@ class MapComposer:
     """
 
     def __init__(self, seed: Optional[int] = None,
-                 chunk_width: Optional[int] = TILES_IN_CHUNK,
+                 chunk_width: Optional[int] = DEFAULT_CHUNK_WIDTH,
                  composing_func: Callable[[int, int, int, List[float | Tuple[float, BiomeType]]], float]
                  = base_composing_func) -> None:
         """ Map composer which composes different chunks tile by tile  using specified method.

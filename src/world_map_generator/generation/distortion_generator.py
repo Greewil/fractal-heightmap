@@ -3,7 +3,7 @@ from typing import Optional
 
 import numpy as np
 
-from world_map_generator.default_values import TILES_IN_CHUNK
+from world_map_generator.default_values import DEFAULT_CHUNK_WIDTH
 from world_map_generator.map import Map
 from world_map_generator.map.chunk import ValueChunk
 from world_map_generator.utils import is_power_of_two
@@ -19,8 +19,8 @@ class DistortionGenerator:
         distortion_amplitude    Shift that will ba applied in tile with 1.0 values in shift map.
     """
 
-    def __init__(self, chunk_width: Optional[int] = TILES_IN_CHUNK,
-                 distortion_amplitude: int = TILES_IN_CHUNK) -> None:
+    def __init__(self, chunk_width: Optional[int] = DEFAULT_CHUNK_WIDTH,
+                 distortion_amplitude: int = DEFAULT_CHUNK_WIDTH) -> None:
         """ Tool for map distortion which uses two shift maps for x-axis and y-axis.
 
         :param chunk_width:          Chunk size which defines tiles matrix.
