@@ -126,7 +126,7 @@ if __name__ == '__main__':
     bounding.for_each(lambda x, y: round_structures_map_distorted_x2.set_chunk(
         distortion_generator.distort_map_chunk(x, y, round_structures_map_distorted,
                                                distortion_y_map.get_chunk(x, y),
-                                               distortion_x_map.get_chunk(x, y))))
+                                               distortion_x_map.get_chunk(x, y))), False)
     print(time.process_time() - start, 'seconds')
     save_height_map_as_image(round_structures_map_distorted_x2, 'round_structures1_distorted_x2', bounding,
                              max_color_value=2)
@@ -141,7 +141,7 @@ if __name__ == '__main__':
     map_composer = MapComposer(height_map.seed, chunk_width, composing_func)
     bounding.for_each(lambda x, y: composed_map.set_chunk(
         map_composer.compose_chunks(x, y, [height_map.get_chunk(x, y),
-                                           round_structures_map_distorted_x2.get_chunk(x, y)])))
+                                           round_structures_map_distorted_x2.get_chunk(x, y)])), False)
     print(time.process_time() - start, 'seconds')
     print(round_structures_map.number_of_generated_chunks(), round_structures_map.number_of_generated_tiles())
     save_height_map_as_image(composed_map, 'round_structures1_composed', max_color_value=1.5)

@@ -5,7 +5,7 @@ from world_map_generator.default_values import DEFAULT_CHUNK_WIDTH
 from world_map_generator.utils import Bounding
 from world_map_generator.utils import get_random_seed
 from .biome import biome_tile_to_dict, BiomeType
-from .chunk import Chunk, chunk_dict_to_chunk
+from .chunk import Chunk, chunk_dict_to_chunk, ValueChunk, BiomeChunk
 
 
 class Map:
@@ -65,9 +65,16 @@ class Map:
         self.chunks[str(chunk.position)] = chunk
 
     def create_chunk(self, x: int, y: int):
-        """ Create blank chunk if it's not exist. """
+        """
+        Create blank chunk if it's not exist.
+        Chunk type will be the same as for other chunks.
+        If map still don't have any chunks yet, chunk type will be ValueChunk.
+        """
         if not self.is_chunk_exists(x, y):
-            self.chunks[str((x, y))] = Chunk(x, y, self.chunk_width)
+            if self.chunk_type is None or self.chunk_type == 'ValueChunk':
+                self.chunks[str((x, y))] = ValueChunk(x, y, self.chunk_width)
+            elif self.chunk_type == 'BiomeChunk':
+                self.chunks[str((x, y))] = BiomeChunk(x, y, self.chunk_width)
 
     def delete_chunk(self, x: int, y: int):
         if self.chunks.get(str((x, y))) is not None:

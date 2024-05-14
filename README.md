@@ -131,6 +131,8 @@ save_height_map_as_image(height_map, 'heightmap', max_color_value=1.5*base_grid_
 save_biome_map_as_image(biome_map, 'biomes_map')
 ```
 
+[//]: # (TODO round_structures compose distortion)
+
 ### More examples
 
 You can see more code examples here: [examples]
