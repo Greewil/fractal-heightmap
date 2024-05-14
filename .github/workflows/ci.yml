@@ -17,4 +17,7 @@ jobs:
     uses: ./.github/workflows/release_notes_generation.yml
     needs: quality-assurance
 
-#  TODO create and send pip package
+  publish-pypi:
+    name: Publish to test pypi
+    uses: ./.github/workflows/publish_pypi.yml
+    needs: quality-assurance

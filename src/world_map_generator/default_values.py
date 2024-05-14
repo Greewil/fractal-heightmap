@@ -2,7 +2,7 @@
 GENERATOR_VERSION = '0.3.0'
 
 # General generators parameters
-DEFAULT_CHUNK_WIDTH = 64  # TODO rename
+DEFAULT_CHUNK_WIDTH = 64
 
 # Fractal map generation
 DEFAULT_DIAMOND_SQUARE_GRID_STEP = 64
