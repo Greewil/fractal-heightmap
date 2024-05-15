@@ -69,14 +69,14 @@ if __name__ == '__main__':
         round_structure_cos_cos = deepcopy(ATOLL_STRUCTURE_TYPE)
         # round_structure_cos_cos = deepcopy(STEP_ROUND_STRUCTURE_TYPE)
         round_structure_cos_cos.parameters['rotation'] = rnd[3] * 2 * np.pi
-        round_structure_cos_cos.max_r = 25 + 85 * rnd[1]
+        round_structure_cos_cos.max_r = 25 + 185
         # round_structure_cos_cos.max_value = 0.25 + 0.75 * rnd[2]
         round_structure_cos_cos.max_value = 0.25 + 0.75 * rnd[2]
         # round_structure_cos_hyperbole = deepcopy(STEP_ROUND_STRUCTURE_TYPE)
         # round_structure_cos_hyperbole = deepcopy(LINEAR_ROUND_STRUCTURE_TYPE)
         # round_structure_cos_hyperbole = deepcopy(COS_ROUND_STRUCTURE_TYPE)
         round_structure_cos_hyperbole = deepcopy(COS_HYPERBOLE_ROUND_STRUCTURE_TYPE)
-        round_structure_cos_hyperbole.max_r = 25 + 50 * rnd[1]
+        round_structure_cos_hyperbole.max_r = 25 + 150 * rnd[1]
         round_structure_cos_hyperbole.max_value = 0.35 + 0.65 * rnd[2]
         if rnd[0] > 0.5 * tile_x * 0.0035:
             return round_structure_cos_cos
@@ -87,15 +87,21 @@ if __name__ == '__main__':
 
     start = time.process_time()
     round_structures_map = Map(height_map.seed + 1, chunk_width=chunk_width)
-    generator = DotsGenerator(round_structures_map.seed, chunk_width, 100, 1, 0.0,
-                              # get_round_structure_type, get_value_intersection_sum_clip(), get_d_xy_euclidean_cos(8))
-                              get_round_structure_type, get_value_intersection_sum_clip(), get_d_xy_sum)
+    generator = DotsGenerator(seed=round_structures_map.seed,
+                              chunk_width=chunk_width,
+                              round_structure_grid_step=100,
+                              center_shift_amplitude=1,
+                              filling_value=0.0,
+                              max_possible_impact_radius=210,
+                              get_round_structure_type=get_round_structure_type,
+                              get_value_intersection=get_value_intersection_sum_clip(),
+                              get_d_xy=get_d_xy_sum)
     bounding = Bounding(-2, -2, 10, 10)
     bounding.for_each(lambda x, y: round_structures_map.set_chunk(generator.generate_chunk(x, y)))
     print(time.process_time() - start, 'seconds')
     save_height_map_as_image(round_structures_map, 'round_structures1', max_color_value=2)
 
-    # TODO move all redundant code to another examples
+    # TODO move all code blocks to methods
 
     start = time.process_time()
     bounding = Bounding(-1, -1, 9, 9)
@@ -111,8 +117,7 @@ if __name__ == '__main__':
     start = time.process_time()
     round_structures_map_distorted = Map(height_map.seed + 2, chunk_width=chunk_width)
     distortion_generator = DistortionGenerator(chunk_width)
-    bounding = Bounding(-1, -1, 9, 9)
-    # bounding = Bounding(0, 0, 8, 8)
+    bounding = Bounding(0, 0, 8, 8)
     bounding.for_each(lambda x, y: round_structures_map_distorted.set_chunk(
         distortion_generator.distort_map_chunk(x, y, round_structures_map,
                                                distortion_x_map.get_chunk(x, y),
@@ -120,28 +125,18 @@ if __name__ == '__main__':
     print(time.process_time() - start, 'seconds')
     save_height_map_as_image(round_structures_map_distorted, 'round_structures1_distorted', bounding, max_color_value=2)
 
-    start = time.process_time()
-    bounding = Bounding(0, 0, 8, 8)
-    round_structures_map_distorted_x2 = Map(height_map.seed + 2, chunk_width=chunk_width)
-    bounding.for_each(lambda x, y: round_structures_map_distorted_x2.set_chunk(
-        distortion_generator.distort_map_chunk(x, y, round_structures_map_distorted,
-                                               distortion_y_map.get_chunk(x, y),
-                                               distortion_x_map.get_chunk(x, y))), False)
-    print(time.process_time() - start, 'seconds')
-    save_height_map_as_image(round_structures_map_distorted_x2, 'round_structures1_distorted_x2', bounding,
-                             max_color_value=2)
-
     def composing_func(seed: int, tile_x: int, tile_y: int, tiles: List[float | Tuple[float, BiomeType]]) -> float:
         # return tiles[0] * (0.5 + tiles[1])
         return tiles[0] + 0.5 * tiles[1]
-        # return tiles[0] + tiles[1] * sin(0.01 * tile_x)
+
 
     start = time.process_time()
+    bounding = Bounding(0, 0, 8, 8)
     composed_map = Map(height_map.seed + 3, chunk_width=chunk_width)
     map_composer = MapComposer(height_map.seed, chunk_width, composing_func)
     bounding.for_each(lambda x, y: composed_map.set_chunk(
         map_composer.compose_chunks(x, y, [height_map.get_chunk(x, y),
-                                           round_structures_map_distorted_x2.get_chunk(x, y)])), False)
+                                           round_structures_map_distorted.get_chunk(x, y)])))
     print(time.process_time() - start, 'seconds')
     print(round_structures_map.number_of_generated_chunks(), round_structures_map.number_of_generated_tiles())
     save_height_map_as_image(composed_map, 'round_structures1_composed', max_color_value=1.5)

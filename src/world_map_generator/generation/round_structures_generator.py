@@ -25,7 +25,7 @@ def get_value_intersection_sum(v1: float, v2: float) -> float:
     return v1 + v2
 
 
-def get_value_intersection_sum_clip(clip: Optional[float] = 1) -> float:
+def get_value_intersection_sum_clip(clip: Optional[float] = 1) -> Callable[[float, float], float]:
     def sum_clip(s1: float, s2: float) -> float:
         return min(clip, s1 + s2)
 
@@ -63,7 +63,7 @@ def get_d_xy_l05(dx: float, dy: float) -> float:
     return dxy
 
 
-def get_d_xy_euclidean_cos(cos_periods: Optional[float] = 1) -> float:
+def get_d_xy_euclidean_cos(cos_periods: Optional[float] = 1) -> Callable[[float, float], float]:
     def get_d_xy_euclidean_cos_with_period(dx: float, dy: float) -> float:
         rotation = atan2(dx, dy)
         r_square = dx * dx + dy * dy - dx * dy * cos(cos_periods * rotation)
@@ -98,6 +98,8 @@ class DotsGenerator(ChunkGenerator):
                                     selected by get_round_structure_type method.
         center_shift_amplitude      Max value on which round structure's center could be shifted along axis.
         filling_value               Value that will be used in empty tiles.
+        max_possible_impact_radius  Maximum possible max_r value of RoundStructureType
+                                    that can be returned with your get_round_structure_type method.
         get_round_structure_type    Method which contains logic about round structure type placement on map.
                                     Method returns RoundStructureType or None.
                                     Where input parameters are:
@@ -124,8 +126,9 @@ class DotsGenerator(ChunkGenerator):
                  round_structure_grid_step: Optional[int] = DEFAULT_ROUND_STRUCTURE_GRID_STEP,
                  center_shift_amplitude: Optional[int] = DEFAULT_ROUND_STRUCTURE_GRID_STEP,
                  filling_value: Optional[float] = 0.0,
+                 max_possible_impact_radius: Optional[int] = DEFAULT_ROUND_STRUCTURE_GRID_STEP,
                  get_round_structure_type: Callable[[int, int, int, int, int],
-                                                    RoundStructureType] = get_base_round_structure_type,
+                                                    RoundStructureType | None] = get_base_round_structure_type,
                  get_value_intersection: Optional[Callable[[float, float], float]] = get_value_intersection_sum_clip(),
                  get_d_xy: Optional[Callable[[float, float], float]] = get_d_xy_euclidean):
         """ Generator of round structure map chunks.
@@ -139,6 +142,8 @@ class DotsGenerator(ChunkGenerator):
                                             selected by get_round_structure_type method.
         :param center_shift_amplitude:      Max value on which round structure's center could be shifted along axis.
         :param filling_value:               Value that will be used in empty tiles.
+        :param max_possible_impact_radius:  Maximum possible max_r value of RoundStructureType
+                                            that can be returned with your get_round_structure_type method.
         :param get_round_structure_type:    Method which contains logic about round structure type placement on map.
                                             Method returns RoundStructureType or None.
                                             Where input parameters are:
@@ -161,11 +166,12 @@ class DotsGenerator(ChunkGenerator):
                                                 dy - y distance which equals: y1 - y2 (float).
         """
         super().__init__(seed, chunk_width)
-        self.filling_value = filling_value
+        self._filling_value = filling_value
         self._round_structure_grid_step = round_structure_grid_step
         self._center_shift_amplitude = center_shift_amplitude
         if center_shift_amplitude > round_structure_grid_step:
             raise Exception("round_structure_grid_step should be larger than center_shift_amplitude!")
+        self._max_possible_impact_radius = max_possible_impact_radius
         self._get_round_structure_type = get_round_structure_type
         self._get_value_intersection = get_value_intersection
         self._get_d_xy = get_d_xy
@@ -176,8 +182,16 @@ class DotsGenerator(ChunkGenerator):
         return self._round_structure_grid_step
 
     @property
-    def center_shift_amplitude(self):
+    def center_shift_amplitude(self) -> int:
         return self._center_shift_amplitude
+
+    @property
+    def filling_value(self) -> float:
+        return self._filling_value
+
+    @property
+    def max_possible_impact_radius(self) -> int:
+        return self._max_possible_impact_radius
 
     @property
     def get_round_structure_type(self):
@@ -200,13 +214,24 @@ class DotsGenerator(ChunkGenerator):
         Returns the bounding for round_structure instances which are close enough to impact chunk generation
         in specified coordinates.
         """
-        # TODO optimize
-        round_structure_grid_left_x = (chunk_x * self.chunk_width // self.round_structure_grid_step) - 1
-        round_structure_grid_bottom_y = (chunk_y * self.chunk_width // self.round_structure_grid_step) - 1
-        round_structure_grid_right_x = ((chunk_x + 1) * self.chunk_width // self.round_structure_grid_step) + 1
-        round_structure_grid_top_y = ((chunk_y + 1) * self.chunk_width // self.round_structure_grid_step) + 1
-        return Bounding(round_structure_grid_left_x, round_structure_grid_bottom_y,
-                        round_structure_grid_right_x, round_structure_grid_top_y)
+        left_impact_distance = (chunk_x * self.chunk_width
+                                - self.round_structure_grid_step * self.center_shift_amplitude
+                                - self.max_possible_impact_radius)
+        round_structure_grid_left = (left_impact_distance // self.round_structure_grid_step) - 1
+        bottom_impact_distance = (chunk_y * self.chunk_width
+                                  - self.round_structure_grid_step * self.center_shift_amplitude
+                                  - self.max_possible_impact_radius)
+        round_structure_grid_bottom = (bottom_impact_distance // self.round_structure_grid_step) - 1
+        right_impact_distance = ((chunk_x + 1) * self.chunk_width
+                                 + self.round_structure_grid_step * self.center_shift_amplitude
+                                 + self.max_possible_impact_radius)
+        round_structure_grid_right = (right_impact_distance // self.round_structure_grid_step) + 1
+        top_impact_distance = ((chunk_y + 1) * self.chunk_width
+                               + self.round_structure_grid_step * self.center_shift_amplitude
+                               + self.max_possible_impact_radius)
+        round_structure_grid_top = (top_impact_distance // self.round_structure_grid_step) + 1
+        return Bounding(round_structure_grid_left, round_structure_grid_bottom,
+                        round_structure_grid_right, round_structure_grid_top)
 
     def get_round_structure_center(self, round_structure_node_x: int, round_structure_node_y: int) \
             -> Tuple[float, float]:

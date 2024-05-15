@@ -88,11 +88,11 @@ class BiomeGenerator(ChunkGenerator):
         Returns the bounding for biome instances which are close enough to impact chunk generation
         in specified coordinates.
         """
-        biome_grid_left_x = (chunk_x * self.chunk_width // self.biome_grid_step) - 2
-        biome_grid_bottom_y = (chunk_y * self.chunk_width // self.biome_grid_step) - 2
-        biome_grid_right_x = ((chunk_x + 1) * self.chunk_width // self.biome_grid_step) + 2
-        biome_grid_top_y = ((chunk_y + 1) * self.chunk_width // self.biome_grid_step) + 2
-        return Bounding(biome_grid_left_x, biome_grid_bottom_y, biome_grid_right_x, biome_grid_top_y)
+        biome_grid_left = (chunk_x * self.chunk_width // self.biome_grid_step) - 2
+        biome_grid_bottom = (chunk_y * self.chunk_width // self.biome_grid_step) - 2
+        biome_grid_right = ((chunk_x + 1) * self.chunk_width // self.biome_grid_step) + 2
+        biome_grid_top = ((chunk_y + 1) * self.chunk_width // self.biome_grid_step) + 2
+        return Bounding(biome_grid_left, biome_grid_bottom, biome_grid_right, biome_grid_top)
 
     def get_biome_center(self, biome_node_x: int, biome_node_y: int) -> Tuple[float, float]:
         """ Returns position of biome center which will be the center of voronoi cell. """
