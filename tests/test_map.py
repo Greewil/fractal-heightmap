@@ -77,9 +77,6 @@ def test_set_get_chunk():
     assert True is True
 
 
-# TODO more tests for map
-
-
 @pytest.mark.parametrize("generated_chunks, expected_bounding", [
     ([(0, 0), (1, 1)], Bounding(0, 0, 1, 1)),
     ([(0, 0), (0, 1)], Bounding(0, 0, 0, 1)),
@@ -115,3 +112,6 @@ def test_get_chunk_type():
     assert empty_map.chunk_type is None
     assert value_map.chunk_type == 'ValueChunk'
     assert biome_map.chunk_type == 'BiomeChunk'
+
+
+# TODO tests for map conversions
