@@ -131,9 +131,29 @@ save_height_map_as_image(height_map, 'heightmap', max_color_value=1.5*base_grid_
 save_biome_map_as_image(biome_map, 'biomes_map')
 ```
 
-[//]: # (TODO round_structures compose distortion)
+### Map composing
+
+You can use MapComposer to combine few maps into one new:
+[map composing example].
+
+### Map distortion
+
+You can distort maps with DistortionGenerator using any shift map you want: 
+[distortion maps example].
+
+### Round structures maps
+
+You can generate round structures with DotsGenerator: 
+[round structures example].
 
 ### More examples
+
+One of the common noise realizations is ridged noise. 
+It's realization with distortion will look like this:
+
+<img src="https://github.com/Greewil/fractal-heightmap/assets/40954951/fdbc53d0-8175-4375-8422-168c3e540519" width="256"/>
+
+See realization here: [ridged noise example].
 
 You can see more code examples here: [examples]
 
@@ -150,3 +170,7 @@ fractal-heightmap is licensed under the terms of the MIT License. See [LICENSE] 
 [examples]: https://github.com/Greewil/fractal-heightmap/blob/main/usage_examples
 [biome usage example]: https://github.com/Greewil/fractal-heightmap/blob/main/usage_examples/biome_modifies_heightmap_example.py
 [value maps in modifiers example]: https://github.com/Greewil/fractal-heightmap/blob/main/usage_examples/biome_modifies_using_value_maps_example.py
+[round structures example]: https://github.com/Greewil/fractal-heightmap/blob/main/usage_examples/round_structures_map_examples.py
+[distortion maps example]: https://github.com/Greewil/fractal-heightmap/blob/main/usage_examples/map_distortion_examples.py
+[map composing example]: https://github.com/Greewil/fractal-heightmap/blob/main/usage_examples/map_composing_examples.py
+[ridged noise example]: https://github.com/Greewil/fractal-heightmap/blob/main/usage_examples/ridged_noise_examples.py
