@@ -8,7 +8,7 @@ jobs:
 
   quality-assurance:
     name: Quality Assurance
-    uses: ./.github/workflows/qa.yml
+    uses: ./.github/workflows/quality_assurance.yml
 
   validate-version:
     name: Validate version
