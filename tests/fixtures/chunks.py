@@ -19,13 +19,16 @@ def biome_types():
     return [biome_type_1, biome_type_2, biome_type_3]
 
 
-@pytest.fixture
-def tiles_for_value_chunk(chunk_width, biome_types):
+def generate_random_value_chunk_tiles(chunk_width):
     return np.random.rand(chunk_width * chunk_width).reshape((chunk_width, chunk_width))
 
 
 @pytest.fixture
-def tiles_for_biome_chunk(chunk_width, biome_types):
+def tiles_for_value_chunk(chunk_width):
+    return generate_random_value_chunk_tiles(chunk_width)
+
+
+def generate_random_biome_chunk_tiles(chunk_width, biome_types):
     random_values = np.random.rand(chunk_width * chunk_width).reshape((chunk_width, chunk_width))
     tiles = []
     for i in range(chunk_width):
@@ -36,3 +39,8 @@ def tiles_for_biome_chunk(chunk_width, biome_types):
                 tile.append((random_values[i][j], biome_types[k]))
             tiles[i].append(tile)
     return tiles
+
+
+@pytest.fixture
+def tiles_for_biome_chunk(chunk_width, biome_types):
+    return generate_random_biome_chunk_tiles(chunk_width, biome_types)

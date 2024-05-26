@@ -1,7 +1,7 @@
-from .fixtures.chunks import *
-
 import pytest
 from numpy.testing import assert_array_equal
+
+from .fixtures.chunks import chunk_width, biome_types, tiles_for_value_chunk, tiles_for_biome_chunk  # noqa: F401
 
 from world_map_generator.map.biome import BiomeType, are_biome_tiles_same
 from world_map_generator.map.chunk import ValueChunk, chunk_dict_to_chunk, BiomeChunk, json_to_chunk
