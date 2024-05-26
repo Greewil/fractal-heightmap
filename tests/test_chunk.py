@@ -1,8 +1,9 @@
-import numpy as np
+from .fixtures.chunks import *
+
 import pytest
 from numpy.testing import assert_array_equal
 
-from world_map_generator.map.biome import BiomeType
+from world_map_generator.map.biome import BiomeType, are_biome_tiles_same
 from world_map_generator.map.chunk import ValueChunk, chunk_dict_to_chunk, BiomeChunk, json_to_chunk
 
 
@@ -61,33 +62,45 @@ def test_get_chunk_type():
     assert biome_chunk.chunk_type == "BiomeChunk"
 
 
-def test_convert_value_chunk_to_dict():
-    chunk_width = 32
-    tiles = np.random.rand(chunk_width * chunk_width).reshape((chunk_width, chunk_width))
-    chunk = ValueChunk(1, 14, chunk_width, tiles)
+def test_convert_value_chunk_to_dict(chunk_width, tiles_for_value_chunk):
+    chunk = ValueChunk(1, 14, chunk_width, tiles_for_value_chunk)
     chunk_as_dict = chunk.to_dict()
-    assert chunk_dict_to_chunk(chunk_as_dict).chunk_width == chunk_width
-    assert chunk_dict_to_chunk(chunk_as_dict).chunk_type == chunk.chunk_type
-    assert chunk_dict_to_chunk(chunk_as_dict).position == chunk.position
-    assert_array_equal(chunk_dict_to_chunk(chunk_as_dict).tiles, chunk.tiles)
+    chunk_from_dict = chunk_dict_to_chunk(chunk_as_dict)
+    assert chunk_from_dict.chunk_width == chunk_width
+    assert chunk_from_dict.chunk_type == chunk.chunk_type
+    assert chunk_from_dict.position == chunk.position
+    assert_array_equal(chunk_from_dict.tiles, chunk.tiles)
 
 
-@pytest.mark.skip(reason="TODO")
-def test_convert_biome_chunk_to_dict():
-    assert True is True
-
-
-def test_convert_value_chunk_to_json():
-    chunk_width = 32
-    tiles = np.random.rand(chunk_width * chunk_width).reshape((chunk_width, chunk_width))
-    chunk = ValueChunk(1, 14, chunk_width, tiles)
+def test_convert_value_chunk_to_json(chunk_width, tiles_for_value_chunk):
+    chunk = ValueChunk(1, 14, chunk_width, tiles_for_value_chunk)
     chunk_as_json = chunk.to_json()
-    assert json_to_chunk(chunk_as_json).chunk_width == chunk_width
-    assert json_to_chunk(chunk_as_json).chunk_type == chunk.chunk_type
-    assert json_to_chunk(chunk_as_json).position == chunk.position
-    assert_array_equal(json_to_chunk(chunk_as_json).tiles, chunk.tiles)
+    chunk_from_json = json_to_chunk(chunk_as_json)
+    assert chunk_from_json.chunk_width == chunk_width
+    assert chunk_from_json.chunk_type == chunk.chunk_type
+    assert chunk_from_json.position == chunk.position
+    assert_array_equal(chunk_from_json.tiles, chunk.tiles)
 
 
-@pytest.mark.skip(reason="TODO")
-def test_convert_biome_chunk_to_json():
-    assert True is True
+def test_convert_biome_chunk_to_dict(chunk_width, biome_types, tiles_for_biome_chunk):
+    chunk = BiomeChunk(1, 14, chunk_width, tiles_for_biome_chunk)
+    chunk_as_dict = chunk.to_dict()
+    chunk_from_dict = chunk_dict_to_chunk(chunk_as_dict, biome_types)
+    assert chunk_from_dict.chunk_width == chunk_width
+    assert chunk_from_dict.chunk_type == chunk.chunk_type
+    assert chunk_from_dict.position == chunk.position
+    for x in range(chunk_width):
+        for y in range(chunk_width):
+            assert are_biome_tiles_same(chunk_from_dict.get_tile(x, y), chunk.get_tile(x, y)) is True
+
+
+def test_convert_biome_chunk_to_json(chunk_width, biome_types, tiles_for_biome_chunk):
+    chunk = BiomeChunk(1, 14, chunk_width, tiles_for_biome_chunk)
+    chunk_as_json = chunk.to_json()
+    chunk_from_json = json_to_chunk(chunk_as_json, biome_types)
+    assert chunk_from_json.chunk_width == chunk_width
+    assert chunk_from_json.chunk_type == chunk.chunk_type
+    assert chunk_from_json.position == chunk.position
+    for x in range(chunk_width):
+        for y in range(chunk_width):
+            assert are_biome_tiles_same(chunk_from_json.get_tile(x, y), chunk.get_tile(x, y)) is True
