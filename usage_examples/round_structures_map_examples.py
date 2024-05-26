@@ -7,10 +7,10 @@ import numpy as np
 from world_map_generator.generation import FractalGenerator, MapComposer, DistortionGenerator
 from world_map_generator.generation.primitives.round_structure import RoundStructureType, \
     COS_COS_ROUND_STRUCTURE_TYPE, COS_HYPERBOLE_ROUND_STRUCTURE_TYPE, COS_ROUND_STRUCTURE_TYPE, \
-    LINEAR_ROUND_STRUCTURE_TYPE, STEP_ROUND_STRUCTURE_TYPE
+    LINEAR_ROUND_STRUCTURE_TYPE, STEP_ROUND_STRUCTURE_TYPE  # noqa: F401
 from world_map_generator.generation.round_structures_generator import DotsGenerator, get_value_intersection_max, \
     get_value_intersection_sum_clip, get_value_intersection_sum, get_d_xy_euclidean, get_d_xy_min, get_d_xy_l3, \
-    get_d_xy_l4, get_d_xy_l3_abs, get_d_xy_l05, get_d_xy_max, get_d_xy_euclidean_cos, get_d_xy_sum
+    get_d_xy_l4, get_d_xy_l3_abs, get_d_xy_l05, get_d_xy_max, get_d_xy_euclidean_cos, get_d_xy_sum  # noqa: F401
 from world_map_generator.map import Map
 from world_map_generator.map.biome import BiomeType
 from world_map_generator.rendering import save_height_map_as_image
@@ -128,7 +128,6 @@ if __name__ == '__main__':
     def composing_func(seed: int, tile_x: int, tile_y: int, tiles: List[float | Tuple[float, BiomeType]]) -> float:
         # return tiles[0] * (0.5 + tiles[1])
         return tiles[0] + 0.5 * tiles[1]
-
 
     start = time.process_time()
     bounding = Bounding(0, 0, 8, 8)
