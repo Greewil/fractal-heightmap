@@ -39,7 +39,7 @@ setup(
         "Operating System :: MacOS :: MacOS X",
         "Operating System :: Microsoft :: Windows",
     ],
-    python_requires=">=3.8"
+    python_requires=">=3.10"
 )
 
 # https://pypi.org/classifiers/
