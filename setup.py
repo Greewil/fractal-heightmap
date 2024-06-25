@@ -5,9 +5,12 @@ import os
 from src.world_map_generator.default_values import GENERATOR_VERSION
 
 here = os.path.abspath(os.path.dirname(__file__))
-
-with codecs.open(os.path.join(here, "src/README.md"), encoding="utf-8") as fh:
-    long_description = "\n" + fh.read()
+readme_path = os.path.join(here, "src/README.md")
+if os.path.isfile(readme_path):
+    with codecs.open(readme_path, encoding="utf-8") as fh:
+        long_description = "\n" + fh.read()
+else:
+    long_description = "\n"
 
 VERSION = GENERATOR_VERSION
 print(f'App version: {VERSION}')

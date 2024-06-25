@@ -6,19 +6,20 @@ import PIL.Image as Image
 import PIL.ImageDraw as ImageDraw
 from scipy.spatial import Voronoi
 
-from world_map_generator.default_values import TILES_IN_CHUNK, BIOME_GRID_STEP, BIOME_BLEND_RADIOS
+from world_map_generator.default_values import DEFAULT_CHUNK_WIDTH, DEFAULT_BIOME_GRID_STEP, DEFAULT_BIOME_BLEND_RADIOS
+from .chunk_generator import ChunkGenerator
 from world_map_generator.map import Map
-from world_map_generator.map.biome import BiomeType, BiomeInstance, BASE_BIOME_TYPE
+from world_map_generator.map.biome import BiomeType, BiomeInstance, BASE_BIOME_TYPE, add_biome_to_biome_tile
 from world_map_generator.map.chunk import BiomeChunk
 from world_map_generator.utils import Bounding
-from world_map_generator.utils import get_random_seed, is_power_of_two, get_position_seed
+from world_map_generator.utils import get_position_seed
 
 
 def get_base_biome_type(biome_node_x: int, biome_node_y: int, seed: int) -> BiomeType:
     return BASE_BIOME_TYPE
 
 
-class BiomeGenerator:
+class BiomeGenerator(ChunkGenerator):
     """ Generator of biome map chunks based on voronoi algorithm.
 
     Attributes:
@@ -33,11 +34,12 @@ class BiomeGenerator:
         biome_blend_radios      Width of biome blending line in which biomes will be mixed together.
         get_biome_type          Method which contains logic about biome type placement on map.
                                 First parameter is biome_node_x, second - biome_node_y, third - biome map seed.
+                                Method returns BiomeType.
     """
 
-    def __init__(self, seed: Optional[int] = None, chunk_width: Optional[int] = TILES_IN_CHUNK,
-                 biome_grid_step: Optional[int] = BIOME_GRID_STEP,
-                 biome_blend_radios: Optional[int] = BIOME_BLEND_RADIOS,
+    def __init__(self, seed: Optional[int] = None, chunk_width: Optional[int] = DEFAULT_CHUNK_WIDTH,
+                 biome_grid_step: Optional[int] = DEFAULT_BIOME_GRID_STEP,
+                 biome_blend_radios: Optional[int] = DEFAULT_BIOME_BLEND_RADIOS,
                  get_biome_type: Callable[[int, int, int], BiomeType] = get_base_biome_type):
         """ Generator of biome map chunks based on voronoi algorithm.
         :param seed:                Number which is used in procedural generation.
@@ -45,38 +47,21 @@ class BiomeGenerator:
         :param chunk_width:         Chunk size which defines tiles matrix.
                                     Tile matrix size which should be [chunk_width x chunk_width].
                                     Chunk width should be the power of 2.
-        :param biome_grid_step:     Distance between two closest base grid biome region centers.
-                                    Near one biome region center will be created biome center
+        :param biome_grid_step:     Distance between two closest base grid region centers.
+                                    Near one region center will be created biome center
                                     and biome area will be determined with voronoi algorithm.
         :param biome_blend_radios:  Width of biome blending line in which biomes will be mixed together.
         :param get_biome_type:      Method which contains logic about biome type placement on map.
                                     First parameter is biome_node_x, second - biome_node_y, third - biome map seed.
+                                    Method returns BiomeType.
         """
-        if seed is None:
-            self.seed = get_random_seed()
-        else:
-            self.seed = seed
-        if not is_power_of_two(chunk_width):
-            raise Exception("chunk_width should be the power of 2!")
-        self._chunk_width = chunk_width
+        super().__init__(seed, chunk_width)
         self._biome_grid_step = biome_grid_step
         self._biome_blend_radios = biome_blend_radios
         self._get_biome_type = get_biome_type
         self._clean_value_matrix()
         self._blending_point_code = 255
         # may be use "RGB" instead of if more than 255 types (1 for borders) of biomes
-
-    @property
-    def seed(self):
-        return self._seed
-
-    @seed.setter
-    def seed(self, value: int):
-        self._seed = value % (2 ** 32)
-
-    @property
-    def chunk_width(self):
-        return self._chunk_width
 
     @property
     def biome_grid_step(self):
@@ -90,10 +75,6 @@ class BiomeGenerator:
     def get_biome_type(self):
         return self._get_biome_type
 
-    @property
-    def random_sequence(self):
-        return self._random_sequence
-
     def _clean_value_matrix(self):
         """ Sets values of value_matrix (matrix of chunk_width size need for generation) to zeros. """
         self.value_matrix = []
@@ -102,19 +83,19 @@ class BiomeGenerator:
             for j in range(self.chunk_width):
                 self.value_matrix[i].append([])
 
-    def get_closes_biomes_bounding(self, chunk_x: int, chunk_y: int) -> Bounding:
+    def get_closest_biomes_bounding(self, chunk_x: int, chunk_y: int) -> Bounding:
         """
         Returns the bounding for biome instances which are close enough to impact chunk generation
         in specified coordinates.
         """
-        biome_grid_left_x = (chunk_x * self.chunk_width // self.biome_grid_step) - 2
-        biome_grid_bottom_y = (chunk_y * self.chunk_width // self.biome_grid_step) - 2
-        biome_grid_right_x = ((chunk_x + 1) * self.chunk_width // self.biome_grid_step) + 2
-        biome_grid_top_y = ((chunk_y + 1) * self.chunk_width // self.biome_grid_step) + 2
-        return Bounding(biome_grid_left_x, biome_grid_bottom_y, biome_grid_right_x, biome_grid_top_y)
+        biome_grid_left = (chunk_x * self.chunk_width // self.biome_grid_step) - 2
+        biome_grid_bottom = (chunk_y * self.chunk_width // self.biome_grid_step) - 2
+        biome_grid_right = ((chunk_x + 1) * self.chunk_width // self.biome_grid_step) + 2
+        biome_grid_top = ((chunk_y + 1) * self.chunk_width // self.biome_grid_step) + 2
+        return Bounding(biome_grid_left, biome_grid_bottom, biome_grid_right, biome_grid_top)
 
     def get_biome_center(self, biome_node_x: int, biome_node_y: int) -> Tuple[float, float]:
-        """ Returns biome center position which will be the center of voronoi cell. """
+        """ Returns position of biome center which will be the center of voronoi cell. """
         pos_seed = get_position_seed(biome_node_x, biome_node_y, self.seed)
         np.random.seed(pos_seed)
         rnd = np.random.rand(2)
@@ -124,7 +105,7 @@ class BiomeGenerator:
 
     def get_closest_biomes(self, chunk_x: int, chunk_y: int) -> List[BiomeInstance]:
         """ Returns list of biome instances which are close enough to impact chunk generation. """
-        biome_grid_bounding = self.get_closes_biomes_bounding(chunk_x, chunk_y)
+        biome_grid_bounding = self.get_closest_biomes_bounding(chunk_x, chunk_y)
         biomes = []
         for i in range(biome_grid_bounding.left, biome_grid_bounding.right + 1):
             for j in range(biome_grid_bounding.bottom, biome_grid_bounding.top + 1):
@@ -156,7 +137,7 @@ class BiomeGenerator:
 
         :param chunk_x: chunk x position in world
         :param chunk_y: chunk y position in world
-        :param closest_biomes:
+        :param closest_biomes: list of closest biome instances
         :return: numpy matrix with size = [chunk_width x chunk_width]
         """
         self._clean_value_matrix()
@@ -265,18 +246,21 @@ class BiomeGenerator:
                 in_chunk_x, in_chunk_y = i - self.biome_blend_radios, j - self.biome_blend_radios
                 weighted_biomes = self.value_matrix[i - self.biome_blend_radios][j - self.biome_blend_radios]
                 if not borders_smoothing:
-                    weighted_biomes.append((1, closest_biomes[cur_biome_not_blended_id].biome_type))
+                    weighted_biome_type = (1, closest_biomes[cur_biome_not_blended_id].biome_type)
+                    add_biome_to_biome_tile(weighted_biomes, weighted_biome_type)
                 else:
                     shift_x = int(self.biome_blend_radios * (shift_map_x[in_chunk_x, in_chunk_y] - 0.5))
                     shift_y = int(self.biome_blend_radios * (shift_map_y[in_chunk_x, in_chunk_y] - 0.5))
                     cur_biome_blended_id = np_voronoi_image[j + shift_x, i + shift_y]
                     cur_biome_not_blended_id = np_voronoi_bordered_image[j + shift_x, i + shift_y]
                     if cur_biome_not_blended_id != self._blending_point_code:
-                        weighted_biomes.append((shift_map_x[in_chunk_x, in_chunk_y],
-                                                closest_biomes[cur_biome_not_blended_id].biome_type))
+                        weighted_biome_type = (shift_map_x[in_chunk_x, in_chunk_y],
+                                               closest_biomes[cur_biome_not_blended_id].biome_type)
+                        add_biome_to_biome_tile(weighted_biomes, weighted_biome_type)
                     else:
-                        weighted_biomes.append((1, closest_biomes[cur_biome_blended_id].biome_type))
-                        # TODO maybe use few random point and then little smooth
+                        weighted_biome_type = (1, closest_biomes[cur_biome_blended_id].biome_type)
+                        add_biome_to_biome_tile(weighted_biomes, weighted_biome_type)
+                        # maybe use few random point and then little smooth
                         for n in range(int(1.5 * self.biome_blend_radios)):
                             rnd = np.random.rand(2)
                             dx = int(self.biome_blend_radios * (rnd[0] - 0.5))
@@ -285,7 +269,8 @@ class BiomeGenerator:
                             # if cur_biome_blended_id != additional_biome_id:
                             if dx != 0 or dy != 0:
                                 blend_weight = 1 / math.sqrt(dx * dx + dy * dy)
-                                weighted_biomes.append((blend_weight, closest_biomes[additional_biome_id].biome_type))
+                                weighted_biome_type = (blend_weight, closest_biomes[additional_biome_id].biome_type)
+                                add_biome_to_biome_tile(weighted_biomes, weighted_biome_type)
 
         output_chunk = BiomeChunk(chunk_x, chunk_y, self.chunk_width, self.value_matrix)
         return output_chunk

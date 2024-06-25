@@ -1,0 +1,23 @@
+name: CI
+
+on:
+  push:
+    branches: [ "main" ]
+
+  workflow_dispatch:
+
+jobs:
+
+  quality-assurance:
+    name: Quality Assurance
+    uses: ./.github/workflows/quality-assurance.yml
+
+  release-notes-generation:
+    name: Release generation
+    uses: ./.github/workflows/release-notes-generation.yml
+    needs: quality-assurance
+
+  publish-pypi:
+    name: Publish to test pypi
+    uses: ./.github/workflows/publish-pypi.yml
+    needs: quality-assurance

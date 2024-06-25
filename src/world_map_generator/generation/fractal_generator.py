@@ -3,14 +3,15 @@ from typing import Optional, Any
 
 import numpy as np
 
-from world_map_generator.default_values import TILES_IN_CHUNK, DIAMOND_SQUARE_GRID_STEP, \
-    DIAMOND_SQUARE_BASE_GRID_MAX_VALUE
+from world_map_generator.default_values import DEFAULT_CHUNK_WIDTH, DEFAULT_DIAMOND_SQUARE_GRID_STEP, \
+    DEFAULT_DIAMOND_SQUARE_GRID_MAX_VALUE
+from .chunk_generator import ChunkGenerator
 from world_map_generator.map.chunk import ValueChunk
-from world_map_generator.utils import Bounding, get_random_seed
+from world_map_generator.utils import Bounding
 from world_map_generator.utils import get_position_seed, is_power_of_two
 
 
-class FractalGenerator:
+class FractalGenerator(ChunkGenerator):
     """ Generator of value map chunks based on diamond square algorithm.
 
     Attributes:
@@ -35,9 +36,9 @@ class FractalGenerator:
                                     and second element in tuple is radius for x-shape.
     """
 
-    def __init__(self, seed: Optional[int] = None, chunk_width: Optional[int] = TILES_IN_CHUNK,
-                 base_grid_distance: Optional[int] = DIAMOND_SQUARE_GRID_STEP,
-                 base_grid_max_value: Optional[float] = DIAMOND_SQUARE_BASE_GRID_MAX_VALUE) -> None:
+    def __init__(self, seed: Optional[int] = None, chunk_width: Optional[int] = DEFAULT_CHUNK_WIDTH,
+                 base_grid_distance: Optional[int] = DEFAULT_DIAMOND_SQUARE_GRID_STEP,
+                 base_grid_max_value: Optional[float] = DEFAULT_DIAMOND_SQUARE_GRID_MAX_VALUE) -> None:
         """ Generator of value map chunks based on diamond square algorithm.
         :param seed:                Number which is used in procedural generation.
                                     If it wasn't specified it will be generated randomly.
@@ -48,17 +49,11 @@ class FractalGenerator:
                                     Base grid distance should be the power of 2.
         :param base_grid_max_value: Max value which could be set in base grid values.
         """
-        if seed is None:
-            self.seed = get_random_seed()
-        else:
-            self.seed = seed
-        if not is_power_of_two(chunk_width):
-            raise Exception("chunk_width should be the power of 2!")
+        super().__init__(seed, chunk_width)
         if not is_power_of_two(base_grid_distance):
             raise Exception("base_grid_distance should be the power of 2!")
         if base_grid_distance < chunk_width:
             raise Exception("base_grid_distance shouldn't be smaller than chunk_width!")
-        self._chunk_width = chunk_width
         self._base_grid_distance = base_grid_distance
         self._base_grid_steps = int(np.log2(base_grid_distance))
         self._base_grid_max_value = base_grid_max_value
@@ -73,18 +68,6 @@ class FractalGenerator:
             additional_value *= 2
             self.steps_impact_radii.append((radii, radii + additional_value))
         self._clean_value_matrix()
-
-    @property
-    def seed(self):
-        return self._seed
-
-    @seed.setter
-    def seed(self, value: int):
-        self._seed = value % (2 ** 32)
-
-    @property
-    def chunk_width(self):
-        return self._chunk_width
 
     @property
     def base_grid_steps(self):

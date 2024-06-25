@@ -8,3 +8,4 @@ ignore =
 exclude = .git,__pycache__,conf,venv,.vscode,.idea,settings.py
 per-file-ignores =
     __init__.py:F401
+    tests/*:F811

@@ -2,7 +2,7 @@ import functools
 import time
 from typing import List
 
-from world_map_generator.default_values import DIAMOND_SQUARE_BASE_GRID_MAX_VALUE
+from world_map_generator.default_values import DEFAULT_DIAMOND_SQUARE_GRID_MAX_VALUE
 from world_map_generator.generation import BiomeGenerator, FractalGenerator
 from world_map_generator.generation.map_modifier import MapModifier
 from world_map_generator.map import Map
@@ -12,8 +12,9 @@ from world_map_generator.utils import (get_position_seed, weighted_random_select
                                        Bounding)
 
 
-def remove_modifier(height: float, biome_parameters: dict, value_maps_values: List[float] = None) -> float:
-    threshold = 0.35 * DIAMOND_SQUARE_BASE_GRID_MAX_VALUE
+def remove_modifier(height: float, x: float, y: float, seed: int, biome_parameters: dict,
+                    value_maps_values: List[float] = None) -> float:
+    threshold = 0.35 * DEFAULT_DIAMOND_SQUARE_GRID_MAX_VALUE
     if height < threshold:
         return height
     else:
@@ -25,8 +26,9 @@ def remove_modifier(height: float, biome_parameters: dict, value_maps_values: Li
         return 1.5 * height + 30 - 100 * drop
 
 
-def add_modifier(height: float, biome_parameters: dict, value_maps_values: List[float] = None) -> float:
-    threshold = 0.75 * DIAMOND_SQUARE_BASE_GRID_MAX_VALUE
+def add_modifier(height: float, x: float, y: float, seed: int, biome_parameters: dict,
+                 value_maps_values: List[float] = None) -> float:
+    threshold = 0.75 * DEFAULT_DIAMOND_SQUARE_GRID_MAX_VALUE
     if height < threshold:
         return height
     else:
@@ -36,9 +38,10 @@ def add_modifier(height: float, biome_parameters: dict, value_maps_values: List[
         return threshold + (height - threshold) * 1.5 + 50 * drop
 
 
-def cliff_modifier(height: float, biome_parameters: dict, value_maps_values: List[float] = None) -> float:
-    threshold = 0.68 * DIAMOND_SQUARE_BASE_GRID_MAX_VALUE
-    scaled_shift_map = DIAMOND_SQUARE_BASE_GRID_MAX_VALUE * value_maps_values[0]
+def cliff_modifier(height: float, x: float, y: float, seed: int, biome_parameters: dict,
+                   value_maps_values: List[float] = None) -> float:
+    threshold = 0.68 * DEFAULT_DIAMOND_SQUARE_GRID_MAX_VALUE
+    scaled_shift_map = DEFAULT_DIAMOND_SQUARE_GRID_MAX_VALUE * value_maps_values[0]
     if scaled_shift_map < threshold:
         return 0.6 * height
     else:
@@ -82,7 +85,7 @@ if __name__ == '__main__':
     bounding.for_each(lambda x, y: height_map.set_chunk(generator.generate_chunk(x, y)))
     print(time.process_time() - start, 'seconds', '(heightmap)')
     save_height_map_as_image(height_map, 'heightmap',
-                             max_color_value=2 * DIAMOND_SQUARE_BASE_GRID_MAX_VALUE)
+                             max_color_value=2 * DEFAULT_DIAMOND_SQUARE_GRID_MAX_VALUE)
 
     shift_map = Map(height_map.seed + 1)
     shift_generator = FractalGenerator(shift_map.seed, base_grid_max_value=1)
@@ -92,7 +95,7 @@ if __name__ == '__main__':
     wider_bounding.for_each(lambda x, y: shift_map.set_chunk(shift_generator.generate_chunk(x, y)))
     print(time.process_time() - start, 'seconds', '(shift_map)')
     save_height_map_as_image(shift_map, 'shift_map',
-                             max_color_value=2 * DIAMOND_SQUARE_BASE_GRID_MAX_VALUE)
+                             max_color_value=1)
 
     biome_map = Map(height_map.seed)
     biome_generator = BiomeGenerator(biome_map.seed,
@@ -113,4 +116,4 @@ if __name__ == '__main__':
     print(f'seed = {height_map.seed}')
     print(height_map.number_of_generated_chunks(), height_map.number_of_generated_tiles())
     save_height_map_as_image(height_map, 'modified_heightmap_vm',
-                             max_color_value=2 * DIAMOND_SQUARE_BASE_GRID_MAX_VALUE)
+                             max_color_value=2 * DEFAULT_DIAMOND_SQUARE_GRID_MAX_VALUE)
