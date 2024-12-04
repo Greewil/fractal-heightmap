@@ -155,7 +155,15 @@ It's realization with distortion will look like this:
 
 See realization here: [ridged noise example].
 
-You can see more code examples here: [examples]
+You can see more code examples here: [examples].
+
+## Installation
+
+```
+pip install world-map-generator
+```
+
+For more info you can visit [pypi page](https://pypi.org/project/world-map-generator/).
 
 ## License
 
