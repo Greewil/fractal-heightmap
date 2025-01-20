@@ -9,6 +9,8 @@ jobs:
   validate-version:
     name: Validate version
     uses: ./.github/workflows/validate-current-version.yml
+    with:
+      VUH_VERSION: 'v2.9.4'
 
   quality-assurance:
     name: Quality Assurance
