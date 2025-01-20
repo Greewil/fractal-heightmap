@@ -1,5 +1,5 @@
 # Version
-GENERATOR_VERSION = '0.3.0'
+GENERATOR_VERSION = '0.3.1'
 
 # General generators parameters
 DEFAULT_CHUNK_WIDTH = 64
